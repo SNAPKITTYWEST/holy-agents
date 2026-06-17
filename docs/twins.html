@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>twins · holy-agents</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#b0b0b0;font-family:'Courier New',monospace;min-height:100vh}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #1a1a1a}
+.nav-brand{color:#e0e0e0;font-size:14px;letter-spacing:2px}
+.nav-links a{color:#555;text-decoration:none;margin-left:16px;font-size:11px}
+.nav-links a:hover,.nav-links a.active{color:#e0e0e0}
+.container{max-width:900px;margin:0 auto;padding:32px 20px}
+h1{color:#e0e0e0;font-size:18px;margin-bottom:8px}
+p{color:#555;font-size:12px;margin-bottom:24px}
+.twin-card{border:1px solid #1a1a1a;margin-bottom:16px;padding:20px;position:relative;overflow:hidden}
+.twin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.twin-name{color:#e0e0e0;font-size:14px;display:flex;align-items:center;gap:8px}
+.twin-emoji{font-size:20px}
+.twin-zone{color:#444;font-size:10px}
+.twin-status{padding:3px 10px;font-size:10px;border:1px solid;text-transform:uppercase;letter-spacing:1px}
+.twin-status.auditing{border-color:#a84;color:#a84;animation:pulse 1s infinite}
+.twin-status.complete{border-color:#4a9;color:#4a9}
+.twin-status.fail{border-color:#a44;color:#a44}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.twin-body{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.twin-metric{border:1px solid #111;padding:12px}
+.twin-metric-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.twin-metric-value{color:#e0e0e0;font-size:16px}
+.twin-metric-value.pass{color:#4a9}
+.twin-metric-value.fail{color:#a44}
+.twin-metric-value.warn{color:#a84}
+.findings{margin-top:12px;border-top:1px solid #111;padding-top:12px}
+.finding{padding:6px 0;border-bottom:1px solid #0a0a0a;font-size:11px}
+.finding:last-child{border-bottom:none}
+.finding-sev{display:inline-block;width:60px;font-size:9px;text-transform:uppercase}
+.finding-sev.critical{color:#a44}
+.finding-sev.high{color:#a44}
+.finding-sev.medium{color:#a84}
+.finding-sev.low{color:#555}
+.finding-sev.info{color:#444}
+.disagreements{margin-top:16px;border:1px solid #a443;padding:12px}
+.disagreements h3{color:#a44;font-size:11px;margin-bottom:8px}
+.disagreement{font-size:10px;color:#888;margin-bottom:4px}
+.animation-zone{border:1px solid #1a1a1a;padding:16px;margin-bottom:16px;text-align:center}
+#twin-canvas{background:#050505;display:block;margin:0 auto}
+.vote-bar{display:flex;gap:4px;margin-top:12px;justify-content:center}
+.vote{padding:4px 12px;font-size:10px;border:1px solid #1a1a1a}
+.vote.pass{border-color:#4a9;color:#4a9}
+.vote.fail{border-color:#a44;color:#a44}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand">holy-agents</div>
+  <div class="nav-links">
+    <a href="index.html">home</a>
+    <a href="query.html">query</a>
+    <a href="twins.html" class="active">twins</a>
+    <a href="agents.html">agents</a>
+  </div>
+</nav>
+<div class="container">
+  <h1>Digital Twin Audit</h1>
+  <p>Three independent auditors run in parallel. Disagreements are logged, not hidden.</p>
+
+  <div class="animation-zone">
+    <canvas id="twin-canvas" width="860" height="200"></canvas>
+    <div class="vote-bar">
+      <div class="vote" id="vote-a">🛡️ TWIN-A</div>
+      <div class="vote" id="vote-b">⚖️ TWIN-B</div>
+      <div class="vote" id="vote-c">⚡ TWIN-C</div>
+    </div>
+  </div>
+
+  <div class="twin-card" id="twin-a">
+    <div class="twin-header">
+      <div class="twin-name"><span class="twin-emoji">🛡️</span> TWIN-A — Security Auditor</div>
+      <span class="twin-status auditing" id="status-a">auditing</span>
+    </div>
+    <div class="twin-zone">zone: sentinel_gate</div>
+    <div class="twin-body">
+      <div class="twin-metric"><div class="twin-metric-label">Confidence</div><div class="twin-metric-value" id="conf-a">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Verdict</div><div class="twin-metric-value" id="verd-a">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Critical</div><div class="twin-metric-value" id="crit-a">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Findings</div><div class="twin-metric-value" id="find-a">—</div></div>
+    </div>
+    <div class="findings" id="findings-a"></div>
+  </div>
+
+  <div class="twin-card" id="twin-b">
+    <div class="twin-header">
+      <div class="twin-name"><span class="twin-emoji">⚖️</span> TWIN-B — Logic Auditor</div>
+      <span class="twin-status auditing" id="status-b">auditing</span>
+    </div>
+    <div class="twin-zone">zone: court</div>
+    <div class="twin-body">
+      <div class="twin-metric"><div class="twin-metric-label">Confidence</div><div class="twin-metric-value" id="conf-b">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Verdict</div><div class="twin-metric-value" id="verd-b">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">High</div><div class="twin-metric-value" id="high-b">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Findings</div><div class="twin-metric-value" id="find-b">—</div></div>
+    </div>
+    <div class="findings" id="findings-b"></div>
+  </div>
+
+  <div class="twin-card" id="twin-c">
+    <div class="twin-header">
+      <div class="twin-name"><span class="twin-emoji">⚡</span> TWIN-C — Performance Auditor</div>
+      <span class="twin-status auditing" id="status-c">auditing</span>
+    </div>
+    <div class="twin-zone">zone: forge</div>
+    <div class="twin-body">
+      <div class="twin-metric"><div class="twin-metric-label">Confidence</div><div class="twin-metric-value" id="conf-c">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Verdict</div><div class="twin-metric-value" id="verd-c">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Critical</div><div class="twin-metric-value" id="crit-c">—</div></div>
+      <div class="twin-metric"><div class="twin-metric-label">Findings</div><div class="twin-metric-value" id="find-c">—</div></div>
+    </div>
+    <div class="findings" id="findings-c"></div>
+  </div>
+
+  <div class="disagreements" id="disagreements" style="display:none">
+    <h3>⚡ Disagreements</h3>
+    <div id="disagreement-list"></div>
+  </div>
+</div>
+
+<script>
+const REPLAY = {
+  twins: {
+    security: {
+      verdict: 'pass', confidence: 0.92, findings: [
+        { severity: 'low', category: 'weak_randomness', description: 'Math.random() in visualizer.js — not security-relevant' },
+        { severity: 'info', category: 'self_audit', description: 'Security twin does not audit itself — by design' }
+      ]
+    },
+    logic: {
+      verdict: 'pass', confidence: 0.85, findings: [
+        { severity: 'medium', category: 'principle_list', description: 'Required principles hardcoded — add 8th would not be detected' },
+        { severity: 'low', category: 'incomplete_test', description: 'Only one test action in logic twin check' }
+      ]
+    },
+    performance: {
+      verdict: 'pass', confidence: 0.88, findings: [
+        { severity: 'low', category: 'false_async', description: 'Promise.resolve() wrapping sync functions — negligible overhead' },
+        { severity: 'info', category: 'acceptable', description: 'Sync I/O acceptable for startup config reads' }
+      ]
+    }
+  },
+  disagreements: []
+};
+
+const canvas = document.getElementById('twin-canvas');
+const ctx = canvas.getContext('2d');
+const zones = { sentinel_gate: { x: 210, y: 100 }, court: { x: 430, y: 100 }, forge: { x: 650, y: 100 } };
+const twins = [
+  { name: 'TWIN-A', emoji: '🛡️', zone: 'sentinel_gate', color: '#44a' },
+  { name: 'TWIN-B', emoji: '⚖️', zone: 'court', color: '#a84' },
+  { name: 'TWIN-C', emoji: '⚡', zone: 'forge', color: '#a44' }
+];
+let particles = [];
+
+function drawZones() {
+  Object.entries(zones).forEach(([k, v]) => {
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.strokeRect(v.x - 60, v.y - 40, 120, 80);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = '9px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText(k.replace('_', ' '), v.x, v.y + 55);
+  });
+}
+
+function drawTwins() {
+  twins.forEach((t, i) => {
+    const z = zones[t.zone];
+    ctx.font = '24px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(t.emoji, z.x, z.y + 8);
+    ctx.font = '10px Courier New';
+    ctx.fillStyle = t.color;
+    ctx.fillText(t.name, z.x, z.y + 28);
+  });
+}
+
+function spawnParticle(from, to, color) {
+  const fx = zones[from].x, fy = zones[from].y;
+  const tx = zones[to].x, ty = zones[to].y;
+  for (let i = 0; i < 3; i++) {
+    particles.push({
+      x: fx, y: fy,
+      vx: (tx - fx) / 40 + (Math.random() - 0.5) * 2,
+      vy: (ty - fy) / 40 + (Math.random() - 0.5) * 2,
+      life: 40, maxLife: 40, color
+    });
+  }
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawZones();
+  drawTwins();
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.life--;
+    ctx.globalAlpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 2, 2);
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(render);
+}
+render();
+
+async function runAudit() {
+  const twins_data = REPLAY.twins;
+  const labels = ['a', 'b', 'c'];
+  const keys = ['security', 'logic', 'performance'];
+  const confs = ['0.92', '0.85', '0.88'];
+
+  for (let i = 0; i < 3; i++) {
+    await new Promise(r => setTimeout(r, 800));
+    const t = twins_data[keys[i]];
+    document.getElementById(`status-${labels[i]}`).textContent = 'complete';
+    document.getElementById(`status-${labels[i]}`).className = 'twin-status complete';
+    document.getElementById(`conf-${labels[i]}`).textContent = confs[i];
+    document.getElementById(`conf-${labels[i]}`).className = 'twin-metric-value ' + (t.verdict === 'pass' ? 'pass' : 'fail');
+    document.getElementById(`verd-${labels[i]}`).textContent = t.verdict;
+    document.getElementById(`verd-${labels[i]}`).className = 'twin-metric-value ' + (t.verdict === 'pass' ? 'pass' : 'fail');
+    const critCount = t.findings.filter(f => f.severity === 'critical').length;
+    const highCount = t.findings.filter(f => f.severity === 'high').length;
+    document.getElementById(labels[i] === 'b' ? `high-b` : `crit-${labels[i]}`).textContent = labels[i] === 'b' ? highCount : critCount;
+    document.getElementById(`find-${labels[i]}`).textContent = t.findings.length;
+    const findingsEl = document.getElementById(`findings-${labels[i]}`);
+    findingsEl.innerHTML = t.findings.map(f =>
+      `<div class="finding"><span class="finding-sev ${f.severity}">${f.severity}</span> ${f.description}</div>`
+    ).join('');
+    document.getElementById(`vote-${labels[i]}`).className = `vote ${t.verdict}`;
+    spawnParticle(twins[i].zone, twins[(i + 1) % 3].zone, twins[i].color);
+  }
+}
+
+runAudit();
+</script>
+</body>
+</html>

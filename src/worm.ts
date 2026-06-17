@@ -12,17 +12,25 @@ function ensureDir(): void {
   if (!fs.existsSync(WORM_DIR)) fs.mkdirSync(WORM_DIR, { recursive: true });
 }
 
-function readEntries(): WormEntry[] {
+export function readEntries(): WormEntry[] {
   ensureDir();
   if (!fs.existsSync(WORM_FILE)) return [];
-  const lines = fs.readFileSync(WORM_FILE, 'utf-8').split('\n').filter(Boolean);
-  return lines.map(l => JSON.parse(l));
+  const content = fs.readFileSync(WORM_FILE, 'utf-8');
+  const lines = content.split('\n').filter(Boolean);
+  const entries: WormEntry[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    try {
+      entries.push(JSON.parse(lines[i]));
+    } catch {
+      console.error(`WORM: corrupt entry at line ${i + 1}, skipping`);
+    }
+  }
+  return entries;
 }
 
-function writeEntries(entries: WormEntry[]): void {
+function appendLine(line: string): void {
   ensureDir();
-  const lines = entries.map(e => JSON.stringify(e)).join('\n') + '\n';
-  fs.writeFileSync(WORM_FILE, lines, 'utf-8');
+  fs.appendFileSync(WORM_FILE, line + '\n', 'utf-8');
 }
 
 export function appendEntry(event_id: string, agent: AgentName, action: string, verdict: Verdict, citations: string[]): WormEntry {
@@ -42,8 +50,7 @@ export function appendEntry(event_id: string, agent: AgentName, action: string, 
     citations
   };
   entry.hash = computeEntryHash({ seq, prev_hash: prevHash, event_id, agent, action, verdict, timestamp });
-  entries.push(entry);
-  writeEntries(entries);
+  appendLine(JSON.stringify(entry));
   return entry;
 }
 

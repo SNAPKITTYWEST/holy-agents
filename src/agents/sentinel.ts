@@ -1,5 +1,6 @@
 import type { Action, SentinelResult, Verdict } from '../types.js';
 import { checkForbidden, validateAction } from '../validation.js';
+import { loadRTRUST, checkActionAgainstRules } from '../rtrust.js';
 
 export function sentinelCheck(action: Action, agentSignature?: string): SentinelResult {
   const violations: string[] = [];
@@ -15,6 +16,10 @@ export function sentinelCheck(action: Action, agentSignature?: string): Sentinel
   if (forbiddenMatch) {
     violations.push('forbidden_action');
   }
+
+  const rules = loadRTRUST();
+  const rtrustViolations = checkActionAgainstRules(action, rules);
+  violations.push(...rtrustViolations);
 
   return {
     allowed: violations.length === 0,

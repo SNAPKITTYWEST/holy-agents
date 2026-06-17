@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>query · holy-agents</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#b0b0b0;font-family:'Courier New',monospace;min-height:100vh}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #1a1a1a}
+.nav-brand{color:#e0e0e0;font-size:14px;letter-spacing:2px}
+.nav-links a{color:#555;text-decoration:none;margin-left:16px;font-size:11px}
+.nav-links a:hover,.nav-links a.active{color:#e0e0e0}
+.container{max-width:800px;margin:0 auto;padding:32px 20px}
+h1{color:#e0e0e0;font-size:18px;margin-bottom:8px}
+p{color:#555;font-size:12px;margin-bottom:24px}
+.search-box{display:flex;gap:8px;margin-bottom:24px}
+.search-input{flex:1;background:#111;border:1px solid #1a1a1a;color:#e0e0e0;padding:12px 16px;font-family:'Courier New',monospace;font-size:14px;outline:none}
+.search-input:focus{border-color:#333}
+.search-input::placeholder{color:#333}
+.btn{background:#1a1a1a;border:1px solid #333;color:#e0e0e0;padding:12px 24px;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
+.btn:hover{background:#222}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.source-tabs{display:flex;gap:4px;margin-bottom:16px}
+.source-tab{padding:6px 12px;border:1px solid #1a1a1a;background:#0a0a0a;color:#555;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
+.source-tab.active{border-color:#333;color:#e0e0e0}
+.results{display:none}
+.results.visible{display:block}
+.result-section{border:1px solid #1a1a1a;margin-bottom:12px;padding:16px}
+.result-header{color:#e0e0e0;font-size:12px;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.result-header .emoji{font-size:16px}
+.result-body{font-size:11px;color:#888;line-height:1.6}
+.citation{border-left:2px solid #333;padding-left:8px;margin:4px 0;color:#666}
+.definition{color:#4a9;margin:4px 0}
+.verdict{display:inline-block;padding:2px 8px;font-size:10px;border:1px solid;margin-top:4px}
+.verdict.approve{border-color:#4a9;color:#4a9}
+.verdict.reject{border-color:#a44;color:#a44}
+.verdict.repent{border-color:#a84;color:#a84}
+.verdict.pass{border-color:#4a9;color:#4a9}
+.verdict.fail{border-color:#a44;color:#a44}
+.verdict.warn{border-color:#a84;color:#a84}
+.risk{display:inline-block;padding:2px 8px;font-size:10px;border:1px solid;margin-top:4px;margin-left:4px}
+.risk.none{border-color:#333;color:#555}
+.risk.low{border-color:#4a9;color:#4a9}
+.risk.medium{border-color:#a84;color:#a84}
+.risk.high{border-color:#a44;color:#a44}
+.risk.critical{border-color:#a44;color:#a44}
+.loading{text-align:center;color:#555;padding:40px;display:none}
+.loading.visible{display:block}
+.error{color:#a44;font-size:11px;margin-top:8px;display:none}
+.error.visible{display:block}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand">holy-agents</div>
+  <div class="nav-links">
+    <a href="index.html">home</a>
+    <a href="query.html" class="active">query</a>
+    <a href="twins.html">twins</a>
+    <a href="agents.html">agents</a>
+  </div>
+</nav>
+<div class="container">
+  <h1>Query Holy Agents</h1>
+  <p>Search scripture, theology, dictionary, and Wikipedia through the faith-governed pipeline.</p>
+
+  <div class="source-tabs">
+    <div class="source-tab active" data-source="scripture">Scripture</div>
+    <div class="source-tab" data-source="dictionary">Dictionary</div>
+    <div class="source-tab" data-source="wikipedia">Wikipedia</div>
+  </div>
+
+  <div class="search-box">
+    <input class="search-input" id="query" placeholder="What is covenant?" />
+    <button class="btn" id="ask-btn">Ask Holy Agents</button>
+  </div>
+
+  <div class="error" id="error"></div>
+  <div class="loading" id="loading">Running through pipeline...</div>
+
+  <div class="results" id="results">
+    <div class="result-section" id="scribe-section">
+      <div class="result-header"><span class="emoji">🔍📖</span> SCRIBE — Source Retrieval</div>
+      <div class="result-body" id="scribe-body"></div>
+    </div>
+    <div class="result-section" id="judge-section">
+      <div class="result-header"><span class="emoji">⚖️🧠</span> JUDGE — Logic Analysis</div>
+      <div class="result-body" id="judge-body"></div>
+    </div>
+    <div class="result-section" id="prophet-section">
+      <div class="result-header"><span class="emoji">🔥</span> PROPHET — Risk Assessment</div>
+      <div class="result-body" id="prophet-body"></div>
+    </div>
+    <div class="result-section" id="sentinel-section">
+      <div class="result-header"><span class="emoji">🛡️</span> SENTINEL — Security Gate</div>
+      <div class="result-body" id="sentinel-body"></div>
+    </div>
+    <div class="result-section" id="ledge-section">
+      <div class="result-header"><span class="emoji">🧾🔐</span> LEDGE — WORM Seal</div>
+      <div class="result-body" id="ledge-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedSource = 'scripture';
+document.querySelectorAll('.source-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    selectedSource = tab.dataset.source;
+  });
+});
+
+document.getElementById('ask-btn').addEventListener('click', runQuery);
+document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') runQuery(); });
+
+async function runQuery() {
+  const query = document.getElementById('query').value.trim();
+  if (!query) return;
+  const error = document.getElementById('error');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  error.classList.remove('visible');
+  loading.classList.add('visible');
+  results.classList.remove('visible');
+
+  try {
+    const res = await fetch('/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, source_type: selectedSource })
+    });
+    const data = await res.json();
+    loading.classList.remove('visible');
+    results.classList.add('visible');
+    renderScribe(data.scribe);
+    renderJudge(data.judge);
+    renderProphet(data.prophet);
+    renderSentinel(data.sentinel);
+    renderLedge(data.ledge);
+  } catch (err) {
+    loading.classList.remove('visible');
+    error.textContent = err.message;
+    error.classList.add('visible');
+  }
+}
+
+function renderScribe(s) {
+  let html = `<p>Confidence: ${s.confidence}</p><p>${s.summary}</p>`;
+  if (s.citations.length > 0) {
+    html += '<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';
+    s.citations.forEach(c => { html += `<div class="citation"><strong>${c.source}</strong> — ${c.text} <span style="color:#444">(${c.location})</span></div>`; });
+  }
+  if (s.definitions.length > 0) {
+    html += '<p style="margin-top:8px;color:#e0e0e0">Definitions:</p>';
+    s.definitions.forEach(d => { html += `<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`; });
+  }
+  document.getElementById('scribe-body').innerHTML = html;
+}
+
+function renderJudge(j) {
+  let html = `<p>Verdict: <span class="verdict ${j.verdict}">${j.verdict}</span></p>`;
+  html += `<p>Lean Check: ${j.leanCheck ? '✓' : '✗'}</p>`;
+  if (j.violatedRules.length > 0) {
+    html += `<p>Violated: ${j.violatedRules.join(', ')}</p>`;
+  }
+  document.getElementById('judge-body').innerHTML = html;
+}
+
+function renderProphet(p) {
+  let html = `<p>Risk: <span class="risk ${p.riskLevel}">${p.riskLevel}</span> Recommendation: ${p.recommendation}</p>`;
+  if (p.warnings.length > 0) {
+    html += '<p style="margin-top:4px">Warnings:</p>';
+    p.warnings.forEach(w => { html += `<p style="color:#a84">⚠ ${w}</p>`; });
+  }
+  document.getElementById('prophet-body').innerHTML = html;
+}
+
+function renderSentinel(s) {
+  let html = `<p>Allowed: <span class="verdict ${s.allowed ? 'pass' : 'fail'}">${s.allowed ? 'YES' : 'NO'}</span></p>`;
+  html += `<p>${s.reason}</p>`;
+  document.getElementById('sentinel-body').innerHTML = html;
+}
+
+function renderLedge(l) {
+  if (!l) { document.getElementById('ledge-body').innerHTML = '<p>Not sealed (sentinel blocked)</p>'; return; }
+  let html = `<p>Sequence: ${l.sequence}</p>`;
+  html += `<p>Hash: <span style="color:#4a9">${l.hash.slice(0, 16)}...</span></p>`;
+  html += `<p>Sealed: <span class="verdict pass">✓</span></p>`;
+  document.getElementById('ledge-body').innerHTML = html;
+}
+</script>
+</body>
+</html>

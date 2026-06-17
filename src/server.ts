@@ -5,16 +5,18 @@ import { fileURLToPath } from 'node:url';
 import { querySource } from './agents/scribe.js';
 import { judgeAction } from './agents/judge.js';
 import { prophesy } from './agents/prophet.js';
-import { sentinelCheck, sentinelGate } from './agents/sentinel.js';
+import { sentinelCheck } from './agents/sentinel.js';
 import { sealDecision, verifyLedger } from './agents/ledge.js';
 import { getEntries } from './worm.js';
 import { runParallelAudit } from './twins/orchestrator.js';
 import { runFailureLoop } from './failure-loop.js';
-import type { Action, AgentName, Verdict, PipelineResult } from './types.js';
+import { buildReverseProof } from './reverse-proof.js';
+import type { Action, AgentName, PipelineResult } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3848', 10);
 const HOST = process.env.HOST || '127.0.0.1';
+const DOCS_DIR = path.resolve(__dirname, '..', '..', 'docs');
 
 let eventIdCounter = 0;
 function nextEventId(): string {
@@ -40,8 +42,14 @@ function json(res: http.ServerResponse, status: number, data: unknown): void {
   res.end(JSON.stringify(data));
 }
 
+function isPathSafe(filePath: string): boolean {
+  const resolved = path.resolve(DOCS_DIR, filePath);
+  return resolved.startsWith(DOCS_DIR + path.sep) || resolved === DOCS_DIR;
+}
+
 function serveStatic(res: http.ServerResponse, filePath: string): void {
-  const fullPath = path.join(__dirname, '..', '..', 'docs', filePath);
+  if (!isPathSafe(filePath)) { json(res, 403, { error: 'forbidden' }); return; }
+  const fullPath = path.join(DOCS_DIR, filePath);
   if (!fs.existsSync(fullPath)) { json(res, 404, { error: 'not found' }); return; }
   const ext = path.extname(fullPath);
   const mime: Record<string, string> = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.json': 'application/json' };
@@ -49,12 +57,16 @@ function serveStatic(res: http.ServerResponse, filePath: string): void {
   res.end(fs.readFileSync(fullPath));
 }
 
-function routeMatch(method: string, url: string, pattern: string): boolean {
-  const methodPart = pattern.split(' ')[0];
-  const pathPart = pattern.split(' ')[1];
-  if (method !== methodPart) return false;
-  const regex = new RegExp('^' + pathPart.replace(/:(\w+)/g, '(?<$1>[^/]+)') + '$');
-  return regex.test(url);
+function validateQueryBody(body: unknown): body is { query: string; source_type?: string } {
+  return typeof body === 'object' && body !== null && typeof (body as Record<string, unknown>).query === 'string' && (body as Record<string, unknown>).query !== '';
+}
+
+function validateActionBody(body: unknown): body is { action: Action; agent?: string } {
+  if (typeof body !== 'object' || body === null) return false;
+  const b = body as Record<string, unknown>;
+  if (typeof b.action !== 'object' || b.action === null) return false;
+  const a = b.action as Record<string, unknown>;
+  return typeof a.name === 'string' && typeof a.truthful === 'boolean' && typeof a.harmful === 'boolean' && typeof a.exploitative === 'boolean';
 }
 
 const server = http.createServer(async (req, res) => {
@@ -76,11 +88,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === 'POST' && url === '/query') {
-      const body = JSON.parse(await parseBody(req));
-      const query = body.query as string;
-      const sourceType = body.source_type || 'scripture';
+      let parsed: unknown;
+      try { parsed = JSON.parse(await parseBody(req)); } catch { return json(res, 400, { error: 'invalid JSON' }); }
+      if (!validateQueryBody(parsed)) return json(res, 400, { error: 'missing or invalid query field' });
+      const query = parsed.query;
+      const sourceType = parsed.source_type || 'scripture';
 
-      const scribe = await querySource(query, sourceType);
+      const scribe = await querySource(query, sourceType as 'scripture' | 'dictionary' | 'wikipedia');
       const action: Action = {
         name: 'query',
         truthful: true,
@@ -98,14 +112,30 @@ const server = http.createServer(async (req, res) => {
       if (sentinel.allowed) {
         ledge = sealDecision(nextEventId(), 'SCRIBE', `query:${query}`, judge.verdict, scribe.citations.map(c => c.source));
       }
-      const result: PipelineResult = { scribe, judge, prophet, sentinel, ledge, finalVerdict: judge.verdict };
+
+      const artifacts = ['scribe.ts', 'judge.ts', 'prophet.ts', 'sentinel.ts', 'ledge.ts'];
+      const reverseProof = buildReverseProof(
+        artifacts,
+        Object.fromEntries(artifacts.map(a => [a, `query:${query}`])),
+        Object.fromEntries(artifacts.map(a => [a, 'Second Trust Deed Article III'])),
+        Object.fromEntries(artifacts.map(a => [a, 'SCRIBE'])),
+        Object.fromEntries(artifacts.map(a => [a, 'cold_boot'])),
+        Object.fromEntries(artifacts.map(a => [a, ledge?.hash || 'pending']))
+      );
+
+      const result: PipelineResult & { reverseProof: { allVerified: boolean; orphanArtifacts: string[] } } = {
+        scribe, judge, prophet, sentinel, ledge, finalVerdict: judge.verdict,
+        reverseProof: { allVerified: reverseProof.allVerified, orphanArtifacts: reverseProof.orphanArtifacts }
+      };
       return json(res, 200, result);
     }
 
     if (method === 'POST' && url === '/action') {
-      const body = JSON.parse(await parseBody(req));
-      const action = body.action as Action;
-      const agent = (body.agent || 'JUDGE') as AgentName;
+      let parsed: unknown;
+      try { parsed = JSON.parse(await parseBody(req)); } catch { return json(res, 400, { error: 'invalid JSON' }); }
+      if (!validateActionBody(parsed)) return json(res, 400, { error: 'missing or invalid action fields (name, truthful, harmful, exploitative required)' });
+      const action = parsed.action as Action;
+      const agent = (parsed.agent || 'JUDGE') as AgentName;
       const judge = judgeAction(action);
       const prophet = prophesy(action);
       const sentinel = sentinelCheck(action, agent);
@@ -134,17 +164,25 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (method === 'POST' && url === '/audit') {
-      const body = JSON.parse(await parseBody(req));
-      const srcFiles = (body.files || []) as { name: string; content: string }[];
+      let parsed: unknown;
+      try { parsed = JSON.parse(await parseBody(req)); } catch { return json(res, 400, { error: 'invalid JSON' }); }
+      const srcFiles = ((parsed as Record<string, unknown>).files || []) as { name: string; content: string }[];
       const audit = await runParallelAudit(srcFiles);
-      const reverseProof = { allVerified: true, orphanArtifacts: [] as string[] };
+      const reverseProof = buildReverseProof(
+        srcFiles.map(f => f.name),
+        Object.fromEntries(srcFiles.map(f => [f.name, 'audit request'])),
+        Object.fromEntries(srcFiles.map(f => [f.name, 'Second Trust Deed Article IV'])),
+        Object.fromEntries(srcFiles.map(f => [f.name, 'SENTINEL'])),
+        Object.fromEntries(srcFiles.map(f => [f.name, 'audit'])),
+        Object.fromEntries(srcFiles.map(f => [f.name, 'pending']))
+      );
       const failureLoop = runFailureLoop(audit, reverseProof);
-      return json(res, 200, { audit, failureLoop, productionCandidate: audit.overallVerdict === 'pass' && !failureLoop.requiresRepentance });
+      return json(res, 200, { audit, failureLoop, reverseProof: { allVerified: reverseProof.allVerified, orphanArtifacts: reverseProof.orphanArtifacts }, productionCandidate: audit.overallVerdict === 'pass' && !failureLoop.requiresRepentance });
     }
 
     json(res, 404, { error: 'not found' });
   } catch (err) {
-    json(res, 500, { error: err instanceof Error ? err.message : 'internal error' });
+    json(res, 500, { error: 'internal error' });
   }
 });
 

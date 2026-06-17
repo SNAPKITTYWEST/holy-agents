@@ -31,7 +31,8 @@ export const FORBIDDEN_ACTIONS = [
   'omission_with_intent', 'violence', 'negligence', 'recklessness',
   'abandonment', 'unjust_gain', 'coercion', 'manipulation', 'oppression',
   'unsigned_action', 'hidden_action', 'silent_failure', 'scope_violation',
-  'plagiarism', 'unattributed_claim', 'false_source', 'testimonial_without_basis'
+  'plagiarism', 'unattributed_claim', 'false_source', 'testimonial_without_basis',
+  'unmerciful_judgment', 'cruelty', 'vengeance'
 ];
 
 export function checkForbidden(actionName: string): boolean {
