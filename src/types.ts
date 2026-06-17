@@ -157,3 +157,13 @@ export interface PipelineResult {
   ledge: LedgeResult | null;
   finalVerdict: Verdict;
 }
+
+export interface EnkiResult {
+  claim: string;
+  quantumPerspective: string;
+  biblicalPerspective: string;
+  tension: string;
+  synthesis: string;
+  confidence: number;
+  sources: string[];
+}

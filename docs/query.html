@@ -347,7 +347,8 @@ function classify(q){
   return{intent:'scripture_search',corpora:['scripture','enoch','apocrypha','theology','wikipedia','dictionary']};
 }
 
-function searchCorpus(kw,corpus){return corpus.filter(e=>e.k.some(k=>kw.some(q=>k.includes(q)||q.includes(k)))).map(e=>({source:e.s,text:e.t,location:e.l}));}
+const STOP_WORDS=new Set(['a','an','the','in','on','of','to','is','it','or','and','was','who','how','do','does']);
+function searchCorpus(kw,corpus){const m=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));if(!m.length)return[];return corpus.filter(e=>e.k.some(k=>m.some(q=>q===k||(q.length>=4&&k.length>=4&&(k.includes(q)||q.includes(k)))))).map(e=>({source:e.s,text:e.t,location:e.l}));}
 function searchWiki(kw){return WIKI.filter(a=>a.k.some(k=>kw.some(q=>k.includes(q)||q.includes(k)))).map(a=>({source:'wikipedia',text:a.summary,location:a.title}));}
 function searchDict(q){const l=q.toLowerCase();return DICT.filter(d=>l.includes(d.term)||d.term.includes(l)||d.syn.some(s=>l.includes(s))).map(d=>({term:d.term,definition:d.def,part_of_speech:d.pos}));}
 function searchEtym(q){const l=q.toLowerCase();return ETYMOLOGY.filter(e=>l.includes(e.term)||e.term.includes(l)).map(e=>({term:e.term,root:e.root,origin:e.origin,meaning:e.meaning,languages:e.langs}));}
@@ -375,17 +376,18 @@ async function runQuery(){
   document.getElementById('intent-type').textContent=cls.intent;
   document.getElementById('intent-corpora').textContent=cls.corpora.join(', ');
 
-  // Step 1: Truth Gate
+  // Step 1: Truth Gate (pre-check)
   setStep(1,'active');
   const kw=q.toLowerCase().split(/\s+/);
+  const meaningfulKw=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));
   await new Promise(r=>setTimeout(r,100));log('GATE','checking boolean truth gate...');
   const isGibberish=/^[a-z]{20,}$/.test(q.replace(/\s+/g,''));
   const isEmpty=q.length===0;
-  const truthPassed=!isGibberish&&!isEmpty;
+  const preGatePassed=!isGibberish&&!isEmpty&&meaningfulKw.length>0;
   setStep(1,'done');
-  document.getElementById('gate-body').innerHTML=truthPassed
+  document.getElementById('gate-body').innerHTML=preGatePassed
     ?`<div class="gate-pass">TRUTH GATE: PASSED</div><p>Query is truth-seeking and well-formed.</p>`
-    :`<div class="gate-fail">TRUTH GATE: FAILED</div><p>${isGibberish?'Query appears to be gibberish.':'Query is empty.'}</p>`;
+    :`<div class="gate-fail">TRUTH GATE: FAILED</div><p>${isGibberish?'Query appears to be gibberish.':isEmpty?'Query is empty.':'Query has no meaningful terms (all stop words).'}</p>`;
 
   // Step 2: Dictionary
   setStep(2,'active');
@@ -426,19 +428,22 @@ async function runQuery(){
   setStep(6,'active');
   await new Promise(r=>setTimeout(r,100));log('CITE','checking citations...');
   let allCit=dedupe([
-    ...searchCorpus(kw,BIBLE),
-    ...searchCorpus(kw,ENOCH),
-    ...searchCorpus(kw,APOCRYPHA),
-    ...searchCorpus(kw,THEOLOGY),
-    ...searchCorpus(kw,RTRUST),
-    ...searchWiki(kw)
+    ...searchCorpus(meaningfulKw,BIBLE),
+    ...searchCorpus(meaningfulKw,ENOCH),
+    ...searchCorpus(meaningfulKw,APOCRYPHA),
+    ...searchCorpus(meaningfulKw,THEOLOGY),
+    ...searchCorpus(meaningfulKw,RTRUST),
+    ...searchWiki(meaningfulKw)
   ]);
-  const conf=allCit.length>0?Math.min(0.4+allCit.length*0.12,0.95):defs.length>0?0.6:0.15;
+  const citText=allCit.map(c=>(c.text+' '+c.location).toLowerCase()).join(' ');
+  const relevantCit=allCit.length>0?meaningfulKw.some(k=>citText.includes(k)):false;
+  const conf=relevantCit?Math.min(0.4+allCit.length*0.12,0.95):allCit.length>0?0.2:defs.length>0?0.6:0.15;
+  if(!relevantCit&&allCit.length>0)allCit=[];
   const cited=allCit.length>0;
   setStep(6,'done');
   let citeHtml=`<p>Confidence: ${conf} · Citations: ${allCit.length}</p>`;
   if(allCit.length>0){citeHtml+='<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';allCit.forEach(c=>{citeHtml+=`<div class="citation"><span class="src ${c.source}">${c.source}</span> ${c.text} <span style="color:#444">(${c.location})</span></div>`;});}
-  else{citeHtml+='<p style="color:#a44">No citations found.</p>';}
+  else{citeHtml+='<p style="color:#a44">No relevant citations found.</p>';}
   document.getElementById('cite-body').innerHTML=citeHtml;
 
   // Step 7: Sentinel

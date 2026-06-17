@@ -233,9 +233,14 @@ function classifyIntent(query: string): IntentClassification {
 }
 
 function searchCorpus(keywords: string[], corpus: CorpusEntry[]): Citation[] {
+  const stopWords = new Set(['a','an','the','in','on','of','to','is','it','or','and','was','who','how','do','does']);
+  const meaningful = keywords.filter(k => k.length >= 3 && !stopWords.has(k));
+  if (meaningful.length === 0) return [];
   const hits: Citation[] = [];
   for (const entry of corpus) {
-    const matchCount = entry.keywords.filter(k => keywords.some(kw => k.includes(kw) || kw.includes(k))).length;
+    const matchCount = entry.keywords.filter(k =>
+      meaningful.some(kw => kw === k || (kw.length >= 4 && k.length >= 4 && (k.includes(kw) || kw.includes(k))))
+    ).length;
     if (matchCount > 0) hits.push({ source: entry.source, text: entry.text, location: entry.location });
   }
   return hits;
@@ -274,12 +279,22 @@ function rankAndDedupe(citations: Citation[]): Citation[] {
   });
 }
 
-function truthGate(query: string, citations: Citation[], definitions: Definition[]): boolean {
+function truthGate(query: string, citations: Citation[], definitions: Definition[], etymologies: Etymology[], translations: CrossLanguage[]): boolean {
   const q = query.toLowerCase().trim();
   const gibberish = /^[a-z]{20,}$/.test(q.replace(/\s+/g, ''));
   const empty = q.length === 0;
-  const noCitationsAndNoDefinitions = citations.length === 0 && definitions.length === 0;
-  return !gibberish && !empty && !noCitationsAndNoDefinitions;
+  const hasAnyData = definitions.length > 0 || etymologies.length > 0 || translations.length > 0;
+  const hasCitations = citations.length > 0;
+  if (gibberish || empty) return false;
+  if (!hasCitations && !hasAnyData) return false;
+  const terms = q.split(/\s+/).filter(t => t.length >= 3);
+  if (terms.length === 0) return false;
+  if (hasCitations) {
+    const citText = citations.map(c => c.text.toLowerCase() + ' ' + c.location.toLowerCase()).join(' ');
+    const matchCount = terms.filter(t => citText.includes(t)).length;
+    if (matchCount === 0) return false;
+  }
+  return true;
 }
 
 function buildPlainEnglish(query: string, definitions: Definition[], citations: Citation[], etymologies: Etymology[], translations: CrossLanguage[]): PlainEnglish {
@@ -346,7 +361,7 @@ export async function scribeQuery(query: string): Promise<ScribeResult> {
 
   const etymologies = searchEtymology(query);
   const translations = searchTranslations(query);
-  const passed = truthGate(query, allCitations, allDefinitions);
+  const passed = truthGate(query, allCitations, allDefinitions, etymologies, translations);
   const plainEnglish = buildPlainEnglish(query, allDefinitions, allCitations, etymologies, translations);
 
   const confidence = allCitations.length > 0
