@@ -91,6 +91,10 @@ const server = http.createServer(async (req, res) => {
       return serveStatic(res, url.slice(6));
     }
 
+    if (method === 'GET' && (url === '/debate.html' || url === '/query.html' || url === '/twins.html' || url === '/agents.html')) {
+      return serveStatic(res, url.slice(1));
+    }
+
     if (method === 'POST' && url === '/query') {
       let parsed: unknown;
       try { parsed = JSON.parse(await parseBody(req)); } catch { return json(res, 400, { error: 'invalid JSON' }); }
