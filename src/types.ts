@@ -4,9 +4,15 @@ export type Verdict = 'approve' | 'reject' | 'repent';
 
 export type RiskLevel = 'none' | 'low' | 'medium' | 'high' | 'critical';
 
-export type SourceType = 'scripture' | 'dictionary' | 'wikipedia' | 'enoch' | 'apocrypha' | 'theology' | 'rtrust' | 'worm';
+export type SourceType = 'scripture' | 'dictionary' | 'wikipedia' | 'enoch' | 'apocrypha' | 'theology' | 'rtrust' | 'worm' | 'islamic' | 'judaic' | 'hindu' | 'quantum' | 'philosophy';
 
 export type IntentType = 'definition' | 'scripture_search' | 'theology_search' | 'comparison' | 'rtrust_query' | 'unknown';
+
+export type SynthesisLabel = 'metaphor' | 'analogy' | 'doctrine' | 'hypothesis' | 'fact';
+
+export type ClaimType = 'fact' | 'hypothesis' | 'synthesis' | 'analogy' | 'misconception' | 'noise' | 'unverified';
+
+export type VerdictType = 'supported' | 'contested' | 'unresolved' | 'rejected' | 'insufficient_evidence';
 
 export interface IntentClassification {
   intent: IntentType;
@@ -166,4 +172,77 @@ export interface EnkiResult {
   synthesis: string;
   confidence: number;
   sources: string[];
+  synthesis_label: SynthesisLabel;
+}
+
+export interface TensionMap {
+  domain_a: string;
+  domain_b: string;
+  claim: string;
+  support: string[];
+  conflict: string[];
+  unresolved_questions: string[];
+  confidence: number;
+  synthesis_label: SynthesisLabel;
+}
+
+export interface AdversaryResult {
+  passed: boolean;
+  challenges: AdversaryChallenge[];
+  verdict: Verdict;
+}
+
+export interface AdversaryChallenge {
+  target: string;
+  type: AdversaryFlagType;
+  description: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+}
+
+export type AdversaryFlagType =
+  | 'weak_analogy'
+  | 'uncited_doctrine'
+  | 'overclaiming'
+  | 'tradition_collapse'
+  | 'scientific_misuse'
+  | 'uncertainty_language'
+  | 'metaphor_as_proof';
+
+export interface MisconceptionResult {
+  claim: string;
+  classification: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  reason: string;
+}
+
+export interface NoiseResult {
+  claim: string;
+  type: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+}
+
+export interface DebateRound {
+  round: number;
+  question: string;
+  scribe: { citations: { source: string; text: string; location: string }[]; confidence: number };
+  enki: { claim: string; synthesis: string; synthesis_label: SynthesisLabel; confidence: number; tensionMap: TensionMap };
+  adversary: { passed: boolean; challenges: AdversaryChallenge[]; verdict: Verdict };
+  misconception: MisconceptionResult[];
+  noise: NoiseResult[];
+  judge: { verdict: Verdict; violatedRules: string[]; leanCheck: boolean };
+  prophet: { riskLevel: string; warnings: string[]; recommendation: string };
+  sentinel: { allowed: boolean; reason: string; classification: ClaimType };
+  ledge: { sequence: number; hash: string; sealed: boolean } | null;
+  scores: { evidence: number; logic: number; citation: number; resistance: number; confidence: number };
+  verdict: VerdictType;
+}
+
+export interface DebateResult {
+  question: string;
+  rounds: DebateRound[];
+  finalVerdict: VerdictType;
+  totalClaims: number;
+  claimsByType: Record<ClaimType, number>;
+  sealedHash: string | null;
 }

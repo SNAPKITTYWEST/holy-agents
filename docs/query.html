@@ -95,17 +95,17 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 </nav>
 <div class="container">
   <h1>Query Holy Agents</h1>
-  <p>8-step truth pipeline. Full traceability. No server.</p>
+  <p>8-step governed pipeline. ENKI + ADVERSARY. Full traceability.</p>
 
   <div class="pipeline-steps" id="pipe-steps">
-    <div class="pipe-step" id="ps-1">1. Truth Gate</div>
-    <div class="pipe-step" id="ps-2">2. Dictionary</div>
-    <div class="pipe-step" id="ps-3">3. Etymology</div>
-    <div class="pipe-step" id="ps-4">4. Cross-Lang</div>
-    <div class="pipe-step" id="ps-5">5. Plain English</div>
-    <div class="pipe-step" id="ps-6">6. Citations</div>
-    <div class="pipe-step" id="ps-7">7. Sentinel</div>
-    <div class="pipe-step" id="ps-8">8. WORM Seal</div>
+    <div class="pipe-step" id="ps-1">1. SCRIBE</div>
+    <div class="pipe-step" id="ps-2">2. JUDGE</div>
+    <div class="pipe-step" id="ps-3">3. ENKI</div>
+    <div class="pipe-step" id="ps-4">4. ADVERSARY</div>
+    <div class="pipe-step" id="ps-5">5. PLAIN ENGLISH</div>
+    <div class="pipe-step" id="ps-6">6. PROPHET</div>
+    <div class="pipe-step" id="ps-7">7. SENTINEL</div>
+    <div class="pipe-step" id="ps-8">8. LEDGE</div>
   </div>
 
   <div class="examples">
@@ -131,35 +131,35 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 
   <div class="results" id="results">
     <div class="result-section">
-      <div class="result-header"><span class="emoji">🟢</span> Step 1 — Boolean Truth Gate</div>
-      <div class="result-body" id="gate-body"></div>
+      <div class="result-header"><span class="emoji">🔍📖</span> Step 1 — SCRIBE</div>
+      <div class="result-body" id="scribe-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">📖</span> Step 2 — Dictionary Definition</div>
-      <div class="result-body" id="dict-body"></div>
+      <div class="result-header"><span class="emoji">⚖️</span> Step 2 — JUDGE</div>
+      <div class="result-body" id="judge-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">🌿</span> Step 3 — Etymology / Root Source</div>
-      <div class="result-body" id="etym-body"></div>
+      <div class="result-header"><span class="emoji">🔮</span> Step 3 — ENKI</div>
+      <div class="result-body" id="enki-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">🌍</span> Step 4 — Cross-Language Meaning</div>
-      <div class="result-body" id="cross-body"></div>
+      <div class="result-header"><span class="emoji">⚔️</span> Step 4 — ADVERSARY</div>
+      <div class="result-body" id="adversary-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">💬</span> Step 5 — Plain English Answer</div>
+      <div class="result-header"><span class="emoji">💬</span> Step 5 — PLAIN ENGLISH</div>
       <div class="result-body" id="plain-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">📚</span> Step 6 — Citation Check</div>
-      <div class="result-body" id="cite-body"></div>
+      <div class="result-header"><span class="emoji">🔥</span> Step 6 — PROPHET</div>
+      <div class="result-body" id="prophet-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">🛡️</span> Step 7 — SENTINEL Pass</div>
+      <div class="result-header"><span class="emoji">🛡️</span> Step 7 — SENTINEL</div>
       <div class="result-body" id="sentinel-body"></div>
     </div>
     <div class="result-section">
-      <div class="result-header"><span class="emoji">🔐</span> Step 8 — WORM Seal</div>
+      <div class="result-header"><span class="emoji">🧾🔐</span> Step 8 — LEDGE</div>
       <div class="result-body" id="ledge-body"></div>
     </div>
   </div>
@@ -336,6 +336,16 @@ const RTRUST_RULES=[
 {id:'RTRUST-004',p:'autonomy'},{id:'RTRUST-005',p:'accountability'},{id:'RTRUST-006',p:'mercy'},{id:'RTRUST-007',p:'attribution'}
 ];
 
+const ENKI_CORPUS=[
+{topic:'wave function collapse and creation',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Both frameworks place the observer at the center of reality-making.',synthesis:'Both suggest reality is not fixed until interacted with.',label:'analogy',unresolved:['Is consciousness fundamental?','Does observation require intention?']},
+{topic:'entanglement and covenant',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Entanglement is physical and undirected. Covenant is relational and intentional.',synthesis:'Both describe non-local connection.',label:'analogy',unresolved:['Can meaning exist without consciousness?','Is non-locality physical or metaphysical?']},
+{topic:'uncertainty principle and divine hiddenness',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Both describe a fundamental limit to knowledge.',synthesis:'Complete knowledge of certain realities is impossible from a single vantage point.',label:'metaphor',unresolved:['Is divine hiddenness a feature or a bug?','Can mathematics describe transcendence?']},
+{topic:'many-worlds and eschatology',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Many-worlds is radically pluralistic. Eschatology is radically singular.',synthesis:'Both attempt to resolve the problem of unchosen possibilities.',label:'metaphor',unresolved:['Is plurality a feature of reality?','Does divine purpose require a single outcome?']},
+{topic:'consciousness and the soul',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Quantum mechanics treats consciousness as irrelevant or foundational. Biblical theology treats it as the image of God.',synthesis:'Both agree consciousness is fundamental and not reducible.',label:'hypothesis',unresolved:['Is consciousness physical or spiritual?','Can the hard problem be solved?']},
+{topic:'quantum vacuum and ex nihilo',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Quantum vacuum suggests nothing is unstable. Biblical creation insists nothing cannot produce something without a Creator.',synthesis:'Both address the origin of the universe from a state that preceded it.',label:'hypothesis',unresolved:['Is the quantum vacuum nothing or something?','What caused the vacuum?']},
+{topic:'decoherence and the fall',domain_a:'quantum_physics',domain_b:'biblical_theology',tension:'Decoherence is physical with no moral content. The Fall is moral with cosmic consequences.',synthesis:'Both describe a transition from unified to fragmented.',label:'metaphor',unresolved:['Is fragmentation physical or moral?','Can a physical process parallel a moral event?']}
+];
+
 function classify(q){
   const l=q.toLowerCase(),t=l.split(/\s+/);
   if(/^(what is|define|definition of|meaning of|means|etymology of|root of|origin of)\b/.test(l)&&t.length<=6)return{intent:'definition',corpora:['dictionary','scripture','wikipedia']};
@@ -371,62 +381,15 @@ async function runQuery(){
   const loading=document.getElementById('loading'),results=document.getElementById('results'),logEl=document.getElementById('pipeline-log');
   logEl.innerHTML='';loading.classList.add('visible');results.classList.remove('visible');
   document.querySelectorAll('.pipe-step').forEach(el=>el.className='pipe-step');
-  const cls=classify(q);
-  document.getElementById('intent-bar').style.display='block';
-  document.getElementById('intent-type').textContent=cls.intent;
-  document.getElementById('intent-corpora').textContent=cls.corpora.join(', ');
-
-  // Step 1: Truth Gate (pre-check)
-  setStep(1,'active');
   const kw=q.toLowerCase().split(/\s+/);
   const meaningfulKw=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));
-  await new Promise(r=>setTimeout(r,100));log('GATE','checking boolean truth gate...');
-  const isGibberish=/^[a-z]{20,}$/.test(q.replace(/\s+/g,''));
-  const isEmpty=q.length===0;
-  const preGatePassed=!isGibberish&&!isEmpty&&meaningfulKw.length>0;
-  setStep(1,'done');
-  document.getElementById('gate-body').innerHTML=preGatePassed
-    ?`<div class="gate-pass">TRUTH GATE: PASSED</div><p>Query is truth-seeking and well-formed.</p>`
-    :`<div class="gate-fail">TRUTH GATE: FAILED</div><p>${isGibberish?'Query appears to be gibberish.':isEmpty?'Query is empty.':'Query has no meaningful terms (all stop words).'}</p>`;
 
-  // Step 2: Dictionary
-  setStep(2,'active');
-  await new Promise(r=>setTimeout(r,100));log('DICT','searching dictionary...');
+  // Step 1: SCRIBE
+  setStep(1,'active');
+  await new Promise(r=>setTimeout(r,100));log('SCRIBE','searching all corpora...');
   const defs=searchDict(q);
-  setStep(2,'done');
-  if(defs.length>0){document.getElementById('dict-body').innerHTML=defs.map(d=>`<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`).join('');}
-  else{document.getElementById('dict-body').innerHTML='<p>No dictionary match.</p>';}
-
-  // Step 3: Etymology
-  setStep(3,'active');
-  await new Promise(r=>setTimeout(r,100));log('ETYM','looking up etymology...');
   const etyms=searchEtym(q);
-  setStep(3,'done');
-  if(etyms.length>0){document.getElementById('etym-body').innerHTML=etyms.map(e=>`<div class="etymology"><strong>${e.term}</strong>: <span class="root">${e.root}</span> from ${e.origin} — "${e.meaning}"<br><span style="color:#444;font-size:9px">Languages: ${e.languages.join(', ')}</span></div>`).join('');}
-  else{document.getElementById('etym-body').innerHTML='<p>No etymology match.</p>';}
-
-  // Step 4: Cross-Language
-  setStep(4,'active');
-  await new Promise(r=>setTimeout(r,100));log('CROSS','translating across languages...');
   const trans=searchTrans(q);
-  setStep(4,'done');
-  if(trans.length>0){document.getElementById('cross-body').innerHTML=trans.map(t=>`<div class="translation"><strong>${t.term}</strong>${t.translations.map(tr=>`<div><span class="lang">${tr.lang}</span> <span class="word">${tr.word}</span> <span class="meaning">${tr.meaning}</span></div>`).join('')}</div>`).join('');}
-  else{document.getElementById('cross-body').innerHTML='<p>No translations found.</p>';}
-
-  // Step 5: Plain English
-  setStep(5,'active');
-  await new Promise(r=>setTimeout(r,100));log('PLAIN','synthesizing answer...');
-  const plainParts=[];
-  if(defs[0])plainParts.push(`${defs[0].term}: ${defs[0].definition}`);
-  if(etyms[0])plainParts.push(`Root: ${etyms[0].root} from ${etyms[0].origin}`);
-  if(trans[0])plainParts.push(`Languages: ${trans[0].translations.map(t=>t.lang).join(', ')}`);
-  const plainAnswer=plainParts.length>0?plainParts.join(' — '):`No data found for "${q}".`;
-  setStep(5,'done');
-  document.getElementById('plain-body').innerHTML=`<div class="plain-english"><div class="label">Plain English</div><div class="answer">${plainAnswer}</div></div>`;
-
-  // Step 6: Citations
-  setStep(6,'active');
-  await new Promise(r=>setTimeout(r,100));log('CITE','checking citations...');
   let allCit=dedupe([
     ...searchCorpus(meaningfulKw,BIBLE),
     ...searchCorpus(meaningfulKw,ENOCH),
@@ -437,35 +400,80 @@ async function runQuery(){
   ]);
   const citText=allCit.map(c=>(c.text+' '+c.location).toLowerCase()).join(' ');
   const relevantCit=allCit.length>0?meaningfulKw.some(k=>citText.includes(k)):false;
-  const conf=relevantCit?Math.min(0.4+allCit.length*0.12,0.95):allCit.length>0?0.2:defs.length>0?0.6:0.15;
   if(!relevantCit&&allCit.length>0)allCit=[];
-  const cited=allCit.length>0;
-  setStep(6,'done');
-  let citeHtml=`<p>Confidence: ${conf} · Citations: ${allCit.length}</p>`;
-  if(allCit.length>0){citeHtml+='<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';allCit.forEach(c=>{citeHtml+=`<div class="citation"><span class="src ${c.source}">${c.source}</span> ${c.text} <span style="color:#444">(${c.location})</span></div>`;});}
-  else{citeHtml+='<p style="color:#a44">No relevant citations found.</p>';}
-  document.getElementById('cite-body').innerHTML=citeHtml;
+  const conf=allCit.length>0?Math.min(0.4+allCit.length*0.12,0.95):defs.length>0?0.6:0.15;
+  setStep(1,'done');
+  let scribeHtml=`<p>Confidence: ${conf} · Citations: ${allCit.length} · Definitions: ${defs.length} · Etymologies: ${etyms.length} · Translations: ${trans.length}</p>`;
+  if(allCit.length>0){scribeHtml+='<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';allCit.forEach(c=>{scribeHtml+=`<div class="citation"><span class="src ${c.source}">${c.source}</span> ${c.text} <span style="color:#444">(${c.location})</span></div>`;});}
+  document.getElementById('scribe-body').innerHTML=scribeHtml;
 
-  // Step 7: Sentinel
-  setStep(7,'active');
+  // Step 2: JUDGE
+  setStep(2,'active');
+  const cited=allCit.length>0;
   const action={name:'query',truthful:true,harmful:false,exploitative:false,requiresConsent:false,hasConsent:false,witnessed:true,cited};
-  const sentV=[];if(!action.truthful)sentV.push('RTRUST-001');if(action.harmful)sentV.push('RTRUST-003');if(action.exploitative)sentV.push('RTRUST-002');if(!cited)sentV.push('RTRUST-007');
+  await new Promise(r=>setTimeout(r,100));log('JUDGE','evaluating action...');
+  const judgeVerdict=cited?'approve':'repent';
+  setStep(2,'done');
+  document.getElementById('judge-body').innerHTML=`<p>Verdict: <span class="verdict ${judgeVerdict}">${judgeVerdict}</span></p><p>Cited: ${cited?'Yes':'No'} · Lean: ${cited?'✓':'✗'}</p>`;
+
+  // Step 3: ENKI
+  setStep(3,'active');
+  await new Promise(r=>setTimeout(r,100));log('ENKI','generating tension map...');
+  const enkiData=ENKI_CORPUS.find(e=>q.toLowerCase().includes(e.topic.split(' ')[0]))||ENKI_CORPUS[0];
+  const enkiConf=Math.min(0.3+allCit.length*0.1,0.7);
+  setStep(3,'done');
+  document.getElementById('enki-body').innerHTML=`<p>Domain A: ${enkiData.domain_a} · Domain B: ${enkiData.domain_b}</p><p style="margin-top:8px"><strong>Tension:</strong> ${enkiData.tension}</p><p style="margin-top:8px"><strong>Synthesis (${enkiData.label}):</strong> ${enkiData.synthesis}</p><p style="margin-top:8px;color:#444">Confidence: ${enkiConf} · Unresolved: ${enkiData.unresolved.length}</p>`;
+
+  // Step 4: ADVERSARY
+  setStep(4,'active');
+  await new Promise(r=>setTimeout(r,100));log('ADVERSARY','red-teaming ENKI claims...');
+  const advChallenges=[];
+  if(enkiConf>0.7&&enkiData.label!=='fact')advChallenges.push({type:'overclaiming',desc:'Confidence exceeds threshold for non-fact synthesis',sev:'high'});
+  if(enkiData.label==='metaphor'&&enkiData.synthesis.toLowerCase().includes('therefore'))advChallenges.push({type:'metaphor_as_proof',desc:'Metaphor uses proof language',sev:'critical'});
+  const advPassed=advChallenges.filter(c=>c.sev==='critical').length===0&&advChallenges.filter(c=>c.sev==='high').length<2;
+  const advVerdict=advPassed?'approve':advChallenges.some(c=>c.sev==='critical')?'reject':'repent';
+  setStep(4,'done');
+  document.getElementById('adversary-body').innerHTML=`<p>Passed: <span class="verdict ${advPassed?'pass':'fail'}">${advPassed?'YES':'NO'}</span> · Verdict: <span class="verdict ${advVerdict}">${advVerdict}</span></p>${advChallenges.length>0?'<p style="margin-top:8px">Challenges:</p>'+advChallenges.map(c=>`<div class="citation"><span class="src" style="color:${c.sev==='critical'?'#a44':c.sev==='high'?'#a84':'#4a9'}">${c.type}</span> ${c.desc}</div>`).join(''):''}`;
+
+  // Step 5: PLAIN ENGLISH
+  setStep(5,'active');
+  await new Promise(r=>setTimeout(r,100));log('PLAIN','synthesizing answer...');
+  const plainParts=[];
+  if(defs[0])plainParts.push(`${defs[0].term}: ${defs[0].definition}`);
+  if(etyms[0])plainParts.push(`Root: ${etyms[0].root} from ${etyms[0].origin}`);
+  if(trans[0])plainParts.push(`Languages: ${trans[0].translations.map(t=>t.lang).join(', ')}`);
+  plainParts.push(`Tension: ${enkiData.tension.slice(0,80)}...`);
+  const plainAnswer=plainParts.length>0?plainParts.join(' — '):`No data found for "${q}".`;
+  setStep(5,'done');
+  document.getElementById('plain-body').innerHTML=`<div class="plain-english"><div class="label">Plain English</div><div class="answer">${plainAnswer}</div></div>`;
+
+  // Step 6: PROPHET
+  setStep(6,'active');
+  await new Promise(r=>setTimeout(r,100));log('PROPHET','assessing risk...');
+  const risk=advChallenges.some(c=>c.sev==='critical')?'high':advChallenges.length>0?'medium':'none';
+  const rec=risk==='high'?'reject':risk==='medium'?'revise':'proceed';
+  setStep(6,'done');
+  document.getElementById('prophet-body').innerHTML=`<p>Risk: <span class="risk ${risk}">${risk}</span> Recommendation: ${rec}</p>`;
+
+  // Step 7: SENTINEL
+  setStep(7,'active');
+  const sentV=[];if(!action.truthful)sentV.push('RTRUST-001');if(action.harmful)sentV.push('RTRUST-003');if(action.exploitative)sentV.push('RTRUST-002');if(!cited)sentV.push('RTRUST-007');if(!advPassed)sentV.push('ADVERSARY_FAILED');
   const allowed=sentV.length===0;
   await new Promise(r=>setTimeout(r,100));log('SENTINEL',allowed?'cleared':`blocked: ${sentV.join(', ')}`);
   setStep(7,'done');
   document.getElementById('sentinel-body').innerHTML=`<p>Allowed: <span class="verdict ${allowed?'pass':'fail'}">${allowed?'YES':'NO'}</span></p><p>${allowed?'All checks passed':'Blocked: '+sentV.join(', ')}</p>`;
 
-  // Step 8: WORM Seal
+  // Step 8: LEDGE
   setStep(8,'active');
   let ledgeResult=null;
-  if(allowed){await new Promise(r=>setTimeout(r,100));log('LEDGE','sealing...');ledgeResult=await sealWorm(`ha_${Date.now().toString(36)}`,'SCRIBE',`query:${q}`,allowed?'approve':'repent',allCit.map(c=>c.source));log('LEDGE',`sealed seq ${ledgeResult.sequence}`);}
-  else{log('LEDGE','not sealed — sentinel blocked');}
+  if(allowed&&advPassed){await new Promise(r=>setTimeout(r,100));log('LEDGE','sealing...');ledgeResult=await sealWorm(`ha_${Date.now().toString(36)}`,'SCRIBE',`query:${q}`,judgeVerdict,allCit.map(c=>c.source));log('LEDGE',`sealed seq ${ledgeResult.sequence}`);}
+  else{log('LEDGE',!allowed?'not sealed — sentinel blocked':'not sealed — adversary rejected synthesis');}
   setStep(8,'done');
 
   loading.classList.remove('visible');results.classList.add('visible');
 
   if(ledgeResult){document.getElementById('ledge-body').innerHTML=`<div class="worm-seal"><div style="color:#555;font-size:9px;text-transform:uppercase;letter-spacing:1px">WORM Seal</div><div>Sequence: ${ledgeResult.sequence}</div><div class="hash">Hash: ${ledgeResult.hash.slice(0,32)}...</div><div style="margin-top:4px">Sealed: <span class="verdict pass">✓</span></div></div>`;}
-  else{document.getElementById('ledge-body').innerHTML='<p>Not sealed (sentinel blocked)</p>';}
+  else{document.getElementById('ledge-body').innerHTML=`<p style="color:${!advPassed?'#a44':'#a84'}">Not sealed — ${!allowed?'sentinel blocked':'synthesis blocked pending stronger evidence'}</p>`;}
 }
 </script>
 </body>

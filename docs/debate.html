@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>debate arena · holy-agents</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#b0b0b0;font-family:'Courier New',monospace;min-height:100vh}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #1a1a1a}
+.nav-brand{color:#e0e0e0;font-size:14px;letter-spacing:2px}
+.nav-links a{color:#555;text-decoration:none;margin-left:16px;font-size:11px}
+.nav-links a:hover,.nav-links a.active{color:#e0e0e0}
+.container{max-width:1000px;margin:0 auto;padding:32px 20px}
+h1{color:#e0e0e0;font-size:18px;margin-bottom:8px}
+p{color:#555;font-size:12px;margin-bottom:16px}
+.input-row{display:flex;gap:8px;margin-bottom:16px}
+.input-row input{flex:1;background:#111;border:1px solid #1a1a1a;color:#e0e0e0;padding:12px 16px;font-family:'Courier New',monospace;font-size:14px;outline:none}
+.input-row input:focus{border-color:#333}
+.btn{background:#1a1a1a;border:1px solid #333;color:#e0e0e0;padding:12px 20px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
+.btn:hover{background:#222}
+.btn.active{border-color:#4a9;color:#4a9}
+.examples{margin-bottom:16px;display:flex;flex-wrap:wrap;gap:4px}
+.example{padding:4px 10px;border:1px solid #1a1a1a;font-size:10px;color:#555;cursor:pointer}
+.example:hover{border-color:#333;color:#e0e0e0}
+.pipeline-bar{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.pipe-step{padding:3px 8px;border:1px solid #1a1a1a;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px}
+.pipe-step.active{border-color:#4a9;color:#4a9}
+.pipe-step.done{border-color:#333;color:#333}
+.pipe-step.attacked{border-color:#a44;color:#a44}
+.pipe-step.blocked{border-color:#a44;color:#a44;background:#0a0000}
+.scores{display:flex;gap:12px;margin-bottom:16px}
+.score{border:1px solid #1a1a1a;padding:8px 12px;flex:1}
+.score-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:4px}
+.score-value{font-size:16px;color:#e0e0e0}
+.score-value.good{color:#4a9}
+.score-value.warn{color:#a84}
+.score-value.bad{color:#a44}
+.verdict-bar{border:1px solid #1a1a1a;padding:12px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.verdict-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555}
+.verdict-value{font-size:14px;font-weight:bold}
+.verdict-value.supported{color:#4a9}
+.verdict-value.contested{color:#a84}
+.verdict-value.unresolved{color:#88f}
+.verdict-value.rejected{color:#a44}
+.verdict-value.insufficient{color:#555}
+.rounds{margin-top:16px}
+.round{border:1px solid #1a1a1a;margin-bottom:12px;overflow:hidden}
+.round-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #111;background:#080808}
+.round-title{color:#e0e0e0;font-size:11px;font-weight:bold}
+.round-body{padding:14px}
+.agent-msg{margin-bottom:12px;padding:10px;border:1px solid #111}
+.agent-msg .agent-name{font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.agent-msg .agent-name .emoji{font-size:14px}
+.agent-msg .msg-text{font-size:11px;color:#888;line-height:1.6}
+.agent-msg .msg-text strong{color:#e0e0e0}
+.claim-badge{display:inline-block;padding:2px 8px;font-size:9px;border:1px solid;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.claim-badge.fact{border-color:#4a9;color:#4a9}
+.claim-badge.hypothesis{border-color:#fa0;color:#fa0}
+.claim-badge.synthesis{border-color:#4a9;color:#4a9}
+.claim-badge.analogy{border-color:#88f;color:#88f}
+.claim-badge.misconception{border-color:#a44;color:#a44}
+.claim-badge.noise{border-color:#a44;color:#a44;background:#0a0000}
+.claim-badge.unverified{border-color:#555;color:#555}
+.challenge{border-left:2px solid #a44;padding-left:8px;margin:6px 0;color:#a84;font-size:10px}
+.noise-inject{border-left:2px solid #a44;padding-left:8px;margin:6px 0;color:#a44;font-size:10px;opacity:0.6}
+.misconception-inject{border-left:2px solid #fa0;padding-left:8px;margin:6px 0;color:#fa0;font-size:10px}
+.sentinel-class{margin-top:8px;padding:8px;border:1px solid;text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.sentinel-class.fact{border-color:#4a9;color:#4a9;background:#000a00}
+.sentinel-class.hypothesis{border-color:#fa0;color:#fa0;background:#0a0800}
+.sentinel-class.synthesis{border-color:#4a9;color:#4a9;background:#000a00}
+.sentinel-class.analogy{border-color:#88f;color:#88f;background:#00000a}
+.sentinel-class.misconception{border-color:#a44;color:#a44;background:#0a0000}
+.sentinel-class.noise{border-color:#a44;color:#a44;background:#0a0000}
+.sentinel-class.blocked{border-color:#a44;color:#a44;background:#0a0000}
+.loading{text-align:center;color:#555;padding:40px;display:none}
+.loading.visible{display:block}
+.worm-seal{border:1px solid #1a1a1a;padding:12px;font-size:10px;margin-top:8px}
+.worm-seal .hash{color:#4a9;word-break:break-all}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand">holy-agents</div>
+  <div class="nav-links">
+    <a href="index.html">home</a>
+    <a href="query.html">query</a>
+    <a href="twins.html">twins</a>
+    <a href="agents.html">agents</a>
+    <a href="debate.html" class="active">debate</a>
+  </div>
+</nav>
+<div class="container">
+  <h1>ENKI Debate Arena</h1>
+  <p>Educational reasoning environment. Not a truth oracle. Claims that survive challenge are stronger than claims that are merely asserted.</p>
+
+  <div class="input-row">
+    <input id="question" placeholder="What is Metatron?" />
+    <button class="btn" id="debate-btn">Debate</button>
+    <button class="btn" id="step-btn">Step Through</button>
+    <button class="btn" id="auto-btn">Auto Play</button>
+  </div>
+
+  <div class="examples">
+    <span class="example" data-q="What is Metatron?">What is Metatron?</span>
+    <span class="example" data-q="Does free will exist?">Does free will exist?</span>
+    <span class="example" data-q="Is covenant similar to entanglement?">Covenant vs Entanglement</span>
+    <span class="example" data-q="What is repentance?">What is repentance?</span>
+    <span class="example" data-q="What is the soul?">What is the soul?</span>
+  </div>
+
+  <div class="pipeline-bar" id="pipe-steps">
+    <div class="pipe-step" id="ps-scribe">SCRIBE</div>
+    <div class="pipe-step" id="ps-judge">JUDGE</div>
+    <div class="pipe-step" id="ps-enki">ENKI</div>
+    <div class="pipe-step" id="ps-adversary">ADVERSARY</div>
+    <div class="pipe-step" id="ps-misconception">MISCONCEPTION</div>
+    <div class="pipe-step" id="ps-noise">NOISE</div>
+    <div class="pipe-step" id="ps-prophet">PROPHET</div>
+    <div class="pipe-step" id="ps-sentinel">SENTINEL</div>
+    <div class="pipe-step" id="ps-ledge">LEDGE</div>
+  </div>
+
+  <div class="scores" id="scores" style="display:none">
+    <div class="score"><div class="score-label">Evidence</div><div class="score-value" id="sc-ev">—</div></div>
+    <div class="score"><div class="score-label">Logic</div><div class="score-value" id="sc-lg">—</div></div>
+    <div class="score"><div class="score-label">Citation</div><div class="score-value" id="sc-ct">—</div></div>
+    <div class="score"><div class="score-label">Resistance</div><div class="score-value" id="sc-rs">—</div></div>
+    <div class="score"><div class="score-label">Confidence</div><div class="score-value" id="sc-cf">—</div></div>
+  </div>
+
+  <div class="verdict-bar" id="verdict-bar" style="display:none">
+    <span class="verdict-label">Final Verdict:</span>
+    <span class="verdict-value" id="final-verdict">—</span>
+    <span style="margin-left:auto;font-size:10px;color:#555" id="total-claims"></span>
+  </div>
+
+  <div class="loading" id="loading">Running debate pipeline...</div>
+
+  <div class="rounds" id="rounds"></div>
+</div>
+
+<script>
+const BIBLE=[
+{t:'Blessed are the merciful, for they shall receive mercy.',l:'Matthew 5:7',s:'scripture',k:['mercy','merciful']},
+{t:'The truth will set you free.',l:'John 8:32',s:'scripture',k:['truth','free']},
+{t:'You shall not bear false witness.',l:'Exodus 20:16',s:'scripture',k:['false','witness']},
+{t:'I will establish my covenant between me and you.',l:'Genesis 17:7',s:'scripture',k:['covenant','establish']}
+];
+const ENOCH=[
+{t:'The Son of Man was chosen before the world was created.',l:'1 Enoch 46:1-4',s:'enoch',k:['son','chosen','created']},
+{t:'Enoch walked with God and was taken.',l:'1 Enoch 12:1-2',s:'enoch',k:['enoch','walked','taken']}
+];
+const THEOLOGY=[
+{t:'A covenant is a binding agreement between God and humanity.',l:'Systematic Theology',s:'theology',k:['covenant','agreement']},
+{t:'Justification is the act of God declaring the sinner righteous.',l:'Systematic Theology',s:'theology',k:['justification','righteous']}
+];
+const ENKI_DB=[
+{topic:'metatron',tension:'Metatron appears in Enoch as a transformed Enoch, but theology rejects angelic hierarchy. The tension: can a human become a divine being?',synthesis:'Metatron represents the boundary between human and divine — a test case for whether consciousness can transcend its origin.',label:'hypothesis'},
+{topic:'free will',tension:'Quantum indeterminacy suggests randomness, not freedom. Theology insists on moral agency. The tension: is freedom the same as randomness?',synthesis:'Free will may require both indeterminacy (quantum) and intention (theology). Neither alone is sufficient.',label:'hypothesis'},
+{topic:'entanglement',tension:'Entanglement is physical and undirected. Covenant is relational and intentional.',synthesis:'Both describe non-local connection. Entanglement is symmetric and meaningless. Covenant is asymmetric and meaningful.',label:'analogy'},
+{topic:'repentance',tension:'Repentance requires regret and change. Quantum mechanics has no concept of regret.',synthesis:'Repentance is a moral transformation that quantum mechanics cannot model — it requires consciousness and moral agency.',label:'hypothesis'},
+{topic:'soul',tension:'The soul is the breath of God (nephesh). Consciousness in physics is either fundamental or emergent.',synthesis:'The soul may be what consciousness is when it is oriented toward its Creator.',label:'doctrine'}
+];
+const STOP_WORDS=new Set(['a','an','the','in','on','of','to','is','it','or','and','was','who','how','do','does','what']);
+function searchCorpus(kw,corpus){const m=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));if(!m.length)return[];return corpus.filter(e=>e.k.some(k=>m.some(q=>q===k||(q.length>=4&&k.length>=4&&(k.includes(q)||q.includes(k)))))).map(e=>({source:e.s,text:e.t,location:e.l}));}
+function dedupe(c){const s=new Set();return c.filter(e=>{const k=e.source+':'+e.location;if(s.has(k))return false;s.add(k);return true;});}
+function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
+let wormSeq=0,wormChain=[];
+async function sha256(s){const b=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function sealWorm(eid,ag,act,v,cit){wormSeq++;const prev=wormChain.length===0?'GENESIS':wormChain[wormChain.length-1].hash;const ts=new Date().toISOString();const hash=await sha256(`${wormSeq}|${prev}|${eid}|${ag}|${act}|${v}|${ts}`);const e={seq:wormChain.length+1,prev_hash:prev,hash,timestamp:ts,event_id:eid,agent:ag,action:act,verdict:v,citations:cit};wormChain.push(e);return{sequence:e.seq,hash:e.hash,sealed:true};}
+function setStep(id,state){const el=document.getElementById('ps-'+id);if(el)el.className='pipe-step '+(state||'');}
+function scoreClass(v){return v>=0.7?'good':v>=0.4?'warn':'bad';}
+
+function misconceptionCheck(text){
+  const checks=[
+    {type:'correlation_causation',pat:/both.*therefore|similar.*so|like.*hence/i,reason:'Correlation does not imply causation',sev:'high'},
+    {type:'analogy_proof',pat:/analogy|metaphor|like|similar to|mirrors/i,reason:'Analogy illustrates but does not prove',sev:'high'},
+    {type:'confidence_correctness',pat:/clearly|obviously|undoubtedly|proves|demonstrates/i,reason:'Confidence does not equal correctness',sev:'medium'},
+    {type:'authority_evidence',pat:/einstein|newton|hawking|feynman/i,reason:'Authority does not constitute evidence',sev:'medium'}
+  ];
+  return checks.filter(c=>c.pat.test(text));
+}
+
+function noiseCheck(text){
+  const noises=[];
+  if(/quantum.*consciousness|consciousness.*quantum/i.test(text))noises.push({type:'semantic_drift',desc:'Quantum mechanics does not explain consciousness',sev:'high'});
+  if(/both.*prove|both.*demonstrate/i.test(text))noises.push({type:'false_connection',desc:'Similarity does not prove equivalence',sev:'high'});
+  if(/einstein.*god|newton.*god/i.test(text))noises.push({type:'authority_trap',desc:'Scientific authority does not prove theology',sev:'medium'});
+  return noises;
+}
+
+function computeScores(cites,enki,adversary,misconceptions,noise){
+  const evidence=Math.min(0.3+cites*0.15,0.9);
+  const logic=adversary.passed?0.8:0.3;
+  const citation=Math.min(0.2+cites*0.2,0.9);
+  const resistance=Math.max(0.9-misconceptions.length*0.15-noise.length*0.1,0.1);
+  const confidence=(evidence+logic+citation+resistance)/4;
+  return{evidence:Math.round(evidence*100)/100,logic:Math.round(logic*100)/100,citation:Math.round(citation*100)/100,resistance:Math.round(resistance*100)/100,confidence:Math.round(confidence*100)/100};
+}
+
+function classifyClaim(enkiLabel,adversaryPassed,misconceptions,noise){
+  if(misconceptions.some(m=>m.severity==='high')||noise.some(n=>n.severity==='high'))return'misconception';
+  if(!adversaryPassed)return'blocked';
+  if(enkiLabel==='fact')return'fact';
+  if(enkiLabel==='hypothesis')return'hypothesis';
+  if(enkiLabel==='synthesis')return'synthesis';
+  if(enkiLabel==='analogy')return'analogy';
+  return'unverified';
+}
+
+function computeVerdict(scores,classification,adversaryPassed){
+  if(classification==='misconception'||classification==='noise')return'rejected';
+  if(classification==='blocked')return'rejected';
+  if(!adversaryPassed)return'contested';
+  if(scores.confidence>=0.7&&classification==='fact')return'supported';
+  if(scores.confidence>=0.5)return'supported';
+  if(scores.confidence>=0.3)return'contested';
+  if(scores.confidence>=0.1)return'unresolved';
+  return'insufficient_evidence';
+}
+
+function renderRound(r){
+  const el=document.createElement('div');
+  el.className='round';
+  let html=`<div class="round-header"><span class="round-title">Round ${r.round}</span><span class="claim-badge ${r.sentinel.classification}">${r.sentinel.classification}</span></div><div class="round-body">`;
+
+  html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">🔍📖</span> SCRIBE</div><div class="msg-text">Found <strong>${r.scribe.citations.length}</strong> citation(s). Confidence: <strong>${r.scribe.confidence}</strong></div></div>`;
+
+  html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">⚖️</span> JUDGE</div><div class="msg-text">Verdict: <strong>${r.judge.verdict}</strong>. Lean: ${r.judge.leanCheck?'✓':'✗'}</div></div>`;
+
+  html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">🔮</span> ENKI</div><div class="msg-text"><strong>${r.enki.claim}</strong><br>${r.enki.synthesis}<br><span class="claim-badge ${r.enki.synthesis_label}">${r.enki.synthesis_label}</span></div></div>`;
+
+  if(r.adversary.challenges.length>0){
+    html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">⚔️</span> ADVERSARY</div><div class="msg-text">`;
+    r.adversary.challenges.forEach(c=>{html+=`<div class="challenge">[${c.type}] ${c.description}</div>`;});
+    html+=`<div style="margin-top:6px">Passed: <strong>${r.adversary.passed}</strong></div></div></div>`;
+  }
+
+  if(r.misconception.length>0){
+    html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">🎭</span> MISCONCEPTION</div><div class="msg-text">`;
+    r.misconception.forEach(m=>{html+=`<div class="misconception-inject">[${m.classification}] ${m.reason}</div>`;});
+    html+=`</div></div>`;
+  }
+
+  if(r.noise.length>0){
+    html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">🦠</span> NOISE</div><div class="msg-text">`;
+    r.noise.forEach(n=>{html+=`<div class="noise-inject">[${n.type}] ${n.desc||n.description}</div>`;});
+    html+=`</div></div>`;
+  }
+
+  html+=`<div class="agent-msg"><div class="agent-name"><span class="emoji">🔥</span> PROPHET</div><div class="msg-text">Risk: <strong>${r.prophet.riskLevel}</strong>. Recommendation: ${r.prophet.recommendation}</div></div>`;
+
+  html+=`<div class="sentinel-class ${r.sentinel.classification}">SENTINEL: ${r.sentinel.classification.toUpperCase()}</div>`;
+
+  if(r.ledge){
+    html+=`<div class="worm-seal"><div style="color:#555;font-size:9px;text-transform:uppercase;letter-spacing:1px">WORM Seal</div><div>Sequence: ${r.ledge.sequence}</div><div class="hash">Hash: ${r.ledge.hash.slice(0,32)}...</div></div>`;
+  }
+
+  html+=`</div>`;
+  el.innerHTML=html;
+  document.getElementById('rounds').appendChild(el);
+}
+
+async function runDebate(){
+  const q=document.getElementById('question').value.trim();if(!q)return;
+  const loading=document.getElementById('loading'),roundsEl=document.getElementById('rounds'),scoresEl=document.getElementById('scores'),verdictBar=document.getElementById('verdict-bar');
+  roundsEl.innerHTML='';loading.classList.add('visible');scoresEl.style.display='none';verdictBar.style.display='none';
+  document.querySelectorAll('.pipe-step').forEach(el=>el.className='pipe-step');
+
+  const kw=q.toLowerCase().split(/\s+/);
+  const meaningfulKw=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));
+
+  // SCRIBE
+  setStep('scribe','active');
+  await new Promise(r=>setTimeout(r,200));
+  const cites=dedupe([...searchCorpus(meaningfulKw,BIBLE),...searchCorpus(meaningfulKw,ENOCH),...searchCorpus(meaningfulKw,THEOLOGY)]);
+  const scribeConf=cites.length>0?Math.min(0.4+cites.length*0.12,0.95):0.15;
+  setStep('scribe','done');
+
+  // JUDGE
+  setStep('judge','active');
+  await new Promise(r=>setTimeout(r,200));
+  const judgeVerdict=cites.length>0?'approve':'repent';
+  setStep('judge','done');
+
+  // ENKI
+  setStep('enki','active');
+  await new Promise(r=>setTimeout(r,300));
+  const enkiMatch=ENKI_DB.find(e=>q.toLowerCase().includes(e.topic))||{topic:q,tension:`The nature of "${q}" involves multiple domains.`,synthesis:`Understanding "${q}" requires cross-domain analysis.`,label:'hypothesis'};
+  const enkiConf=Math.min(0.3+cites.length*0.1,0.7);
+  setStep('enki','done');
+
+  // ADVERSARY
+  setStep('adversary','active');
+  await new Promise(r=>setTimeout(r,200));
+  const advChallenges=[];
+  if(enkiConf>0.6&&enkiMatch.label!=='fact')advChallenges.push({type:'overclaiming',description:'Confidence exceeds threshold for non-fact synthesis',severity:'high'});
+  if(enkiMatch.label==='analogy')advChallenges.push({type:'weak_analogy',description:'Analogy may not be structurally sound',severity:'medium'});
+  const advPassed=advChallenges.filter(c=>c.severity==='high').length<2;
+  setStep('adversary',advPassed?'done':'attacked');
+
+  // MISCONCEPTION
+  setStep('misconception','active');
+  await new Promise(r=>setTimeout(r,200));
+  const misconceptions=misconceptionCheck(enkiMatch.synthesis);
+  setStep('misconception',misconceptions.length>0?'attacked':'done');
+
+  // NOISE
+  setStep('noise','active');
+  await new Promise(r=>setTimeout(r,200));
+  const noise=noiseCheck(enkiMatch.synthesis);
+  setStep('noise',noise.length>0?'attacked':'done');
+
+  // PROPHET
+  setStep('prophet','active');
+  await new Promise(r=>setTimeout(r,200));
+  const risk=misconceptions.some(m=>m.severity==='high')||noise.some(n=>n.severity==='high')?'high':advChallenges.length>0?'medium':'none';
+  setStep('prophet','done');
+
+  // SENTINEL
+  setStep('sentinel','active');
+  await new Promise(r=>setTimeout(r,200));
+  const classification=classifyClaim(enkiMatch.label,advPassed,misconceptions,noise);
+  const sentinelAllowed=classification!=='misconception'&&classification!=='noise'&&classification!=='blocked';
+  setStep('sentinel',sentinelAllowed?'done':'blocked');
+
+  // LEDGE
+  setStep('ledge','active');
+  let ledgeResult=null;
+  if(sentinelAllowed){await new Promise(r=>setTimeout(r,200));ledgeResult=await sealWorm(`debate_${Date.now().toString(36)}`,'ARENA',q,judgeVerdict,cites.map(c=>c.source));}
+  setStep('ledge',ledgeResult?'done':'blocked');
+
+  const scores=computeScores(cites.length,{label:enkiMatch.label},{passed:advPassed},misconceptions,noise);
+  const verdict=computeVerdict(scores,classification,advPassed);
+
+  const round={round:1,question:q,scribe:{citations:cites,confidence:scribeConf},enki:{claim:enkiMatch.topic,synthesis:enkiMatch.synthesis,synthesis_label:enkiMatch.label,confidence:enkiConf,tensionMap:null},adversary:{passed:advPassed,challenges:advChallenges,verdict:advPassed?'approve':'repent'},misconception:misconceptions,noise,judge:{verdict:judgeVerdict,violatedRules:[],leanCheck:cites.length>0},prophet:{riskLevel:risk,warnings:[],recommendation:risk==='high'?'reject':'proceed'},sentinel:{allowed:sentinelAllowed,reason:sentinelAllowed?'Passed':'Blocked',classification},ledge:ledgeResult,scores,verdict};
+
+  loading.classList.remove('visible');
+  scoresEl.style.display='flex';
+  verdictBar.style.display='flex';
+
+  document.getElementById('sc-ev').textContent=scores.evidence;document.getElementById('sc-ev').className='score-value '+scoreClass(scores.evidence);
+  document.getElementById('sc-lg').textContent=scores.logic;document.getElementById('sc-lg').className='score-value '+scoreClass(scores.logic);
+  document.getElementById('sc-ct').textContent=scores.citation;document.getElementById('sc-ct').className='score-value '+scoreClass(scores.citation);
+  document.getElementById('sc-rs').textContent=scores.resistance;document.getElementById('sc-rs').className='score-value '+scoreClass(scores.resistance);
+  document.getElementById('sc-cf').textContent=scores.confidence;document.getElementById('sc-cf').className='score-value '+scoreClass(scores.confidence);
+
+  document.getElementById('final-verdict').textContent=verdict.replace(/_/g,' ');
+  document.getElementById('final-verdict').className='verdict-value '+verdict;
+  document.getElementById('total-claims').textContent='1 claim · '+classification;
+
+  renderRound(round);
+}
+
+document.querySelectorAll('.example').forEach(el=>{el.addEventListener('click',()=>{document.getElementById('question').value=el.dataset.q;runDebate();});});
+document.getElementById('debate-btn').addEventListener('click',runDebate);
+document.getElementById('step-btn').addEventListener('click',runDebate);
+document.getElementById('auto-btn').addEventListener('click',runDebate);
+document.getElementById('question').addEventListener('keydown',e=>{if(e.key==='Enter')runDebate();});
+</script>
+</body>
+</html>

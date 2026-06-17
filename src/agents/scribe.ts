@@ -131,6 +131,46 @@ const RTRUST_CORPUS: CorpusEntry[] = [
   { text: 'RTRUST-007: Cite your sources. Principle: attribution.', location: 'RTRUST.md:70-78', source: 'rtrust', keywords: ['rtrust','cite','sources','attribution'] },
 ];
 
+const ISLAMIC_CORPUS: CorpusEntry[] = [
+  { text: 'In the name of God, the Most Gracious, the Most Merciful.', location: 'Quran 1:1', source: 'islamic', keywords: ['bismillah','mercy','gracious'] },
+  { text: 'God is the Light of the heavens and the earth.', location: 'Quran 24:35', source: 'islamic', keywords: ['light','god','heavens','earth'] },
+  { text: 'Indeed, with hardship comes ease.', location: 'Quran 94:6', source: 'islamic', keywords: ['hardship','ease','patience'] },
+  { text: 'And We have certainly honored the children of Adam.', location: 'Quran 17:70', source: 'islamic', keywords: ['honor','children','adam'] },
+  { text: 'Say: He is God, the One. God, the Eternal Refuge.', location: 'Quran 112:1-2', source: 'islamic', keywords: ['tawhid','oneness','god'] },
+];
+
+const JUDAIC_CORPUS: CorpusEntry[] = [
+  { text: 'Hear, O Israel: The Lord our God, the Lord is one.', location: 'Deuteronomy 6:4', source: 'judaic', keywords: ['shema','lord','one','israel'] },
+  { text: 'You shall love your neighbor as yourself.', location: 'Leviticus 19:18', source: 'judaic', keywords: ['love','neighbor'] },
+  { text: 'The Lord is my rock, my fortress, and my deliverer.', location: 'Psalm 18:2', source: 'judaic', keywords: ['lord','rock','fortress'] },
+  { text: 'What does the Lord require of you? To act justly, love mercy, and walk humbly.', location: 'Micah 6:8', source: 'judaic', keywords: ['justice','mercy','humble'] },
+  { text: 'For I am the Lord your God; sanctify yourselves and be holy.', location: 'Leviticus 11:44', source: 'judaic', keywords: ['lord','holy','sanctify'] },
+];
+
+const HINDU_CORPUS: CorpusEntry[] = [
+  { text: 'You have the right to work, but never to the fruit of work.', location: 'Bhagavad Gita 2:47', source: 'hindu', keywords: ['duty','action','karma'] },
+  { text: 'The soul is neither born, and nor does it die.', location: 'Bhagavad Gita 2:20', source: 'hindu', keywords: ['soul','death','eternal'] },
+  { text: 'I am the source of all spiritual and material worlds. Everything emanates from me.', location: 'Bhagavad Gita 10:8', source: 'hindu', keywords: ['krishna','source','creation'] },
+  { text: 'When meditation is mastered, the mind is unwavering like the flame of a lamp in a windless place.', location: 'Bhagavad Gita 6:19', source: 'hindu', keywords: ['meditation','mind','stillness'] },
+  { text: 'There is neither this world, nor the world beyond, nor happiness for the one who doubts.', location: 'Bhagavad Gita 4:40', source: 'hindu', keywords: ['doubt','faith','worlds'] },
+];
+
+const QUANTUM_CORPUS: CorpusEntry[] = [
+  { text: 'The observer determines the outcome of a quantum measurement. Observation is not passive.', location: 'von Neumann, Mathematical Foundations of Quantum Mechanics', source: 'quantum', keywords: ['observer','measurement','wave function'] },
+  { text: 'Entangled particles remain connected regardless of distance. Measuring one determines the other.', location: 'Bell, On the Einstein Podolsky Rosen Paradox', source: 'quantum', keywords: ['entanglement','nonlocality','particles'] },
+  { text: 'The quantum vacuum is not empty — it seethes with virtual particles popping in and out of existence.', location: 'Quantum Field Theory', source: 'quantum', keywords: ['vacuum','virtual particles','energy'] },
+  { text: 'Decoherence explains how quantum superposition breaks down through environmental interaction.', location: 'Zurek, Decoherence and the Quantum-to-Classical Transition', source: 'quantum', keywords: ['decoherence','superposition','classical'] },
+  { text: 'Heisenberg uncertainty: position and momentum cannot both be known precisely simultaneously.', location: 'Heisenberg, 1927', source: 'quantum', keywords: ['uncertainty','position','momentum'] },
+];
+
+const PHILOSOPHY_CORPUS: CorpusEntry[] = [
+  { text: 'The unexamined life is not worth living.', location: 'Socrates, in Plato\'s Apology', source: 'philosophy', keywords: ['examination','life','meaning'] },
+  { text: 'I think, therefore I am.', location: 'Descartes, Discourse on Method', source: 'philosophy', keywords: ['cogito','existence','thinking'] },
+  { text: 'God is dead. God remains dead. And we have killed him.', location: 'Nietzsche, The Gay Science', source: 'philosophy', keywords: ['god','death','nietzsche'] },
+  { text: 'The only true wisdom is in knowing you know nothing.', location: 'Socrates', source: 'philosophy', keywords: ['wisdom','knowledge','ignorance'] },
+  { text: 'Man is condemned to be free.', location: 'Sartre, Being and Nothingness', source: 'philosophy', keywords: ['freedom','existence','condemnation'] },
+];
+
 const ETYMOLOGY_CORPUS: EtymologyEntry[] = [
   { term: 'covenant', root: 'con + venire', origin: 'Latin convenire, Old French covenant', meaning: 'to come together, to agree', languages: ['Latin','Old French','English'] },
   { term: 'mercy', root: 'merces', origin: 'Latin merces, Old French merci', meaning: 'reward, pity, compassion', languages: ['Latin','Old French','English'] },
@@ -228,6 +268,21 @@ function classifyIntent(query: string): IntentClassification {
   }
   if (/repent|repentance|sin|salvation|faith|grace|justif|sanctif|trinity|eschatolog/.test(lower)) {
     return { intent: 'theology_search', corpora: ['theology', 'scripture', 'dictionary', 'wikipedia'], queryTerms: terms };
+  }
+  if (/quran|islam|muhammad|allah|bismillah|tawhid/.test(lower)) {
+    return { intent: 'theology_search', corpora: ['islamic', 'theology', 'wikipedia', 'dictionary'], queryTerms: terms };
+  }
+  if (/torah|shema|rabbi|talmud|synagogue|jewish|judaism/.test(lower)) {
+    return { intent: 'theology_search', corpora: ['judaic', 'theology', 'wikipedia', 'dictionary'], queryTerms: terms };
+  }
+  if (/veda|bhagavad|gita|dharma|karma|brahman|atman|hindu/.test(lower)) {
+    return { intent: 'theology_search', corpora: ['hindu', 'theology', 'wikipedia', 'dictionary'], queryTerms: terms };
+  }
+  if (/quantum|entangle|superposition|decoherence|wave function|observer|vacuum|heisenberg/.test(lower)) {
+    return { intent: 'theology_search', corpora: ['quantum', 'philosophy', 'wikipedia', 'dictionary'], queryTerms: terms };
+  }
+  if (/philosophy|plato|aristotle|nietzsche|sartre|existential|epistemolog|ontolog/.test(lower)) {
+    return { intent: 'theology_search', corpora: ['philosophy', 'wikipedia', 'dictionary'], queryTerms: terms };
   }
   return { intent: 'scripture_search', corpora: ['scripture', 'enoch', 'apocrypha', 'theology', 'wikipedia', 'dictionary'], queryTerms: terms };
 }
@@ -352,6 +407,11 @@ export async function scribeQuery(query: string): Promise<ScribeResult> {
       case 'apocrypha': allCitations.push(...searchCorpus(keywords, APOCRYPHA_CORPUS)); break;
       case 'theology': allCitations.push(...searchCorpus(keywords, THEOLOGY_CORPUS)); break;
       case 'rtrust': allCitations.push(...searchCorpus(keywords, RTRUST_CORPUS)); break;
+      case 'islamic': allCitations.push(...searchCorpus(keywords, ISLAMIC_CORPUS)); break;
+      case 'judaic': allCitations.push(...searchCorpus(keywords, JUDAIC_CORPUS)); break;
+      case 'hindu': allCitations.push(...searchCorpus(keywords, HINDU_CORPUS)); break;
+      case 'quantum': allCitations.push(...searchCorpus(keywords, QUANTUM_CORPUS)); break;
+      case 'philosophy': allCitations.push(...searchCorpus(keywords, PHILOSOPHY_CORPUS)); break;
       case 'wikipedia': allCitations.push(...searchWiki(keywords)); break;
       case 'dictionary': allDefinitions.push(...searchDict(query)); break;
     }
@@ -364,11 +424,26 @@ export async function scribeQuery(query: string): Promise<ScribeResult> {
   const passed = truthGate(query, allCitations, allDefinitions, etymologies, translations);
   const plainEnglish = buildPlainEnglish(query, allDefinitions, allCitations, etymologies, translations);
 
-  const confidence = allCitations.length > 0
+  let confidence = allCitations.length > 0
     ? Math.min(0.4 + allCitations.length * 0.12, 0.95)
     : allDefinitions.length > 0
       ? 0.6
       : 0.15;
+
+  const now = Date.now();
+  const DECAY_HALF_LIFE_MS = 365 * 24 * 60 * 60 * 1000;
+  allCitations = allCitations.map(c => {
+    const ageMatch = c.location.match(/(\d{4})/);
+    if (ageMatch) {
+      const year = parseInt(ageMatch[1]);
+      if (year > 1900 && year < 2100) {
+        const ageMs = now - new Date(year, 0, 1).getTime();
+        const decay = Math.pow(0.5, ageMs / DECAY_HALF_LIFE_MS);
+        return { ...c, confidence: Math.max(confidence * decay, 0.1) };
+      }
+    }
+    return { ...c, confidence };
+  });
 
   const corpusNames = classification.corpora.join(', ');
   const summary = allCitations.length > 0
