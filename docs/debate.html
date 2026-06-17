@@ -164,7 +164,6 @@ const ENKI_DB=[
 const STOP_WORDS=new Set(['a','an','the','in','on','of','to','is','it','or','and','was','who','how','do','does','what']);
 function searchCorpus(kw,corpus){const m=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));if(!m.length)return[];return corpus.filter(e=>e.k.some(k=>m.some(q=>q===k||(q.length>=4&&k.length>=4&&(k.includes(q)||q.includes(k)))))).map(e=>({source:e.s,text:e.t,location:e.l}));}
 function dedupe(c){const s=new Set();return c.filter(e=>{const k=e.source+':'+e.location;if(s.has(k))return false;s.add(k);return true;});}
-function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 let wormSeq=0,wormChain=[];
 async function sha256(s){const b=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
 async function sealWorm(eid,ag,act,v,cit){wormSeq++;const prev=wormChain.length===0?'GENESIS':wormChain[wormChain.length-1].hash;const ts=new Date().toISOString();const hash=await sha256(`${wormSeq}|${prev}|${eid}|${ag}|${act}|${v}|${ts}`);const e={seq:wormChain.length+1,prev_hash:prev,hash,timestamp:ts,event_id:eid,agent:ag,action:act,verdict:v,citations:cit};wormChain.push(e);return{sequence:e.seq,hash:e.hash,sealed:true};}
@@ -261,83 +260,182 @@ function renderRound(r){
   document.getElementById('rounds').appendChild(el);
 }
 
-async function runDebate(){
-  const q=document.getElementById('question').value.trim();if(!q)return;
-  const loading=document.getElementById('loading'),roundsEl=document.getElementById('rounds'),scoresEl=document.getElementById('scores'),verdictBar=document.getElementById('verdict-bar');
-  roundsEl.innerHTML='';loading.classList.add('visible');scoresEl.style.display='none';verdictBar.style.display='none';
-  document.querySelectorAll('.pipe-step').forEach(el=>el.className='pipe-step');
+// --- Pipeline state ---
+let debateMode='idle'; // idle|debate|step|auto
+let autoTimer=null;
+let currentQuestion='';
+let pipelineSteps=[];
+let stepIndex=0;
+let pipelineData={};
 
+const STEP_DELAY={debate:150,auto:800};
+
+function cancelPipeline(){
+  debateMode='idle';
+  if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+  document.getElementById('loading').classList.remove('visible');
+  document.getElementById('debate-btn').textContent='Debate';
+  document.getElementById('debate-btn').disabled=false;
+  document.getElementById('step-btn').textContent='Step Through';
+  document.getElementById('step-btn').disabled=false;
+  document.getElementById('auto-btn').textContent='Auto Play';
+  document.getElementById('auto-btn').disabled=false;
+}
+
+function showStepButtons(mode){
+  const d=document.getElementById('debate-btn');
+  const s=document.getElementById('step-btn');
+  const a=document.getElementById('auto-btn');
+  if(mode==='step'){
+    d.textContent='Debate';d.disabled=false;
+    s.textContent='Next Step';s.disabled=false;a.disabled=true;a.textContent='Auto Play';
+  }else if(mode==='auto'){
+    d.textContent='Debate';d.disabled=false;
+    s.textContent='Pause';s.disabled=false;a.textContent='Stop';a.disabled=false;
+  }else{
+    d.textContent='Debate';d.disabled=false;
+    s.textContent='Step Through';s.disabled=false;
+    a.textContent='Auto Play';a.disabled=false;
+  }
+}
+
+async function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function advanceStep(){
+  if(stepIndex>=pipelineSteps.length)return finishPipeline();
+  const step=pipelineSteps[stepIndex];
+  stepIndex++;
+  await executeStep(step);
+  if(debateMode==='auto'){
+    if(stepIndex>=pipelineSteps.length)return finishPipeline();
+    autoTimer=setTimeout(()=>advanceStep(),STEP_DELAY.auto);
+  }else if(debateMode==='step'){
+    if(stepIndex>=pipelineSteps.length)return finishPipeline();
+    document.getElementById('step-btn').textContent=`Next Step (${stepIndex}/${pipelineSteps.length})`;
+  }else{
+    await sleep(STEP_DELAY.debate);
+    advanceStep();
+  }
+}
+
+async function executeStep(step){
+  const q=currentQuestion;
   const kw=q.toLowerCase().split(/\s+/);
   const meaningfulKw=kw.filter(k=>k.length>=3&&!STOP_WORDS.has(k));
 
-  // SCRIBE
-  setStep('scribe','active');
-  await new Promise(r=>setTimeout(r,200));
-  const cites=dedupe([...searchCorpus(meaningfulKw,BIBLE),...searchCorpus(meaningfulKw,ENOCH),...searchCorpus(meaningfulKw,THEOLOGY)]);
-  const scribeConf=cites.length>0?Math.min(0.4+cites.length*0.12,0.95):0.15;
-  setStep('scribe','done');
+  switch(step){
+    case'scribe':{
+      setStep('scribe','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const cites=dedupe([...searchCorpus(meaningfulKw,BIBLE),...searchCorpus(meaningfulKw,ENOCH),...searchCorpus(meaningfulKw,THEOLOGY)]);
+      const scribeConf=cites.length>0?Math.min(0.4+cites.length*0.12,0.95):0.15;
+      pipelineData.cites=cites;pipelineData.scribeConf=scribeConf;
+      setStep('scribe','done');
+      showAgentMsg('scribe','🔍📖','SCRIBE',`Found <strong>${cites.length}</strong> citation(s). Confidence: <strong>${scribeConf}</strong>`);
+      break;}
+    case'judge':{
+      setStep('judge','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const judgeVerdict=pipelineData.cites.length>0?'approve':'repent';
+      pipelineData.judgeVerdict=judgeVerdict;
+      setStep('judge','done');
+      showAgentMsg('judge','⚖️','JUDGE',`Verdict: <strong>${judgeVerdict}</strong>. Lean: ${pipelineData.cites.length>0?'✓':'✗'}`);
+      break;}
+    case'enki':{
+      setStep('enki','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const enkiMatch=ENKI_DB.find(e=>q.toLowerCase().includes(e.topic))||{topic:q,tension:`The nature of "${q}" involves multiple domains.`,synthesis:`Understanding "${q}" requires cross-domain analysis.`,label:'hypothesis'};
+      const enkiConf=Math.min(0.3+pipelineData.cites.length*0.1,0.7);
+      pipelineData.enkiMatch=enkiMatch;pipelineData.enkiConf=enkiConf;
+      setStep('enki','done');
+      showAgentMsg('enki','🔮','ENKI',`<strong>${enkiMatch.topic}</strong><br>${enkiMatch.synthesis}<br><span class="claim-badge ${enkiMatch.label}">${enkiMatch.label}</span>`);
+      break;}
+    case'adversary':{
+      setStep('adversary','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const advChallenges=[];
+      if(pipelineData.enkiConf>0.6&&pipelineData.enkiMatch.label!=='fact')advChallenges.push({type:'overclaiming',description:'Confidence exceeds threshold for non-fact synthesis',severity:'high'});
+      if(pipelineData.enkiMatch.label==='analogy')advChallenges.push({type:'weak_analogy',description:'Analogy may not be structurally sound',severity:'medium'});
+      const advPassed=advChallenges.filter(c=>c.severity==='high').length<2;
+      pipelineData.advChallenges=advChallenges;pipelineData.advPassed=advPassed;
+      setStep('adversary',advPassed?'done':'attacked');
+      if(advChallenges.length>0){
+        let h='';advChallenges.forEach(c=>{h+=`<div class="challenge">[${c.type}] ${c.description}</div>`;});
+        h+=`<div style="margin-top:6px">Passed: <strong>${advPassed}</strong></div>`;
+        showAgentMsg('adversary','⚔️','ADVERSARY',h);
+      }else{
+        showAgentMsg('adversary','⚔️','ADVERSARY',`No challenges. Passed: <strong>true</strong>`);
+      }
+      break;}
+    case'misconception':{
+      setStep('misconception','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const misconceptions=misconceptionCheck(pipelineData.enkiMatch.synthesis);
+      pipelineData.misconceptions=misconceptions;
+      setStep('misconception',misconceptions.length>0?'attacked':'done');
+      if(misconceptions.length>0){
+        let h='';misconceptions.forEach(m=>{h+=`<div class="misconception-inject">[${m.classification}] ${m.reason}</div>`;});
+        showAgentMsg('misconception','🎭','MISCONCEPTION',h);
+      }else{
+        showAgentMsg('misconception','🎭','MISCONCEPTION','No reasoning errors detected.');
+      }
+      break;}
+    case'noise':{
+      setStep('noise','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const noise=noiseCheck(pipelineData.enkiMatch.synthesis);
+      pipelineData.noise=noise;
+      setStep('noise',noise.length>0?'attacked':'done');
+      if(noise.length>0){
+        let h='';noise.forEach(n=>{h+=`<div class="noise-inject">[${n.type}] ${n.desc}</div>`;});
+        showAgentMsg('noise','🦠','NOISE',h);
+      }else{
+        showAgentMsg('noise','🦠','NOISE','No noise detected.');
+      }
+      break;}
+    case'prophet':{
+      setStep('prophet','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const risk=pipelineData.misconceptions.some(m=>m.severity==='high')||pipelineData.noise.some(n=>n.severity==='high')?'high':pipelineData.advChallenges.length>0?'medium':'none';
+      pipelineData.risk=risk;
+      setStep('prophet','done');
+      showAgentMsg('prophet','🔥','PROPHET',`Risk: <strong>${risk}</strong>. Recommendation: ${risk==='high'?'reject':'proceed'}`);
+      break;}
+    case'sentinel':{
+      setStep('sentinel','active');await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+      const classification=classifyClaim(pipelineData.enkiMatch.label,pipelineData.advPassed,pipelineData.misconceptions,pipelineData.noise);
+      const sentinelAllowed=classification!=='misconception'&&classification!=='noise'&&classification!=='blocked';
+      pipelineData.classification=classification;pipelineData.sentinelAllowed=sentinelAllowed;
+      setStep('sentinel',sentinelAllowed?'done':'blocked');
+      const el=document.createElement('div');
+      el.className=`sentinel-class ${classification}`;
+      el.textContent=`SENTINEL: ${classification.toUpperCase()}`;
+      document.getElementById('rounds').appendChild(el);
+      break;}
+    case'ledge':{
+      setStep('ledge','active');
+      let ledgeResult=null;
+      if(pipelineData.sentinelAllowed){
+        await sleep(debateMode==='debate'?STEP_DELAY.debate:100);
+        ledgeResult=await sealWorm(`debate_${Date.now().toString(36)}`,'ARENA',q,pipelineData.judgeVerdict,pipelineData.cites.map(c=>c.source));
+      }
+      pipelineData.ledgeResult=ledgeResult;
+      setStep('ledge',ledgeResult?'done':'blocked');
+      break;}
+  }
+}
 
-  // JUDGE
-  setStep('judge','active');
-  await new Promise(r=>setTimeout(r,200));
-  const judgeVerdict=cites.length>0?'approve':'repent';
-  setStep('judge','done');
+function showAgentMsg(agentId,emoji,name,html){
+  const el=document.createElement('div');
+  el.className='agent-msg';
+  el.innerHTML=`<div class="agent-name"><span class="emoji">${emoji}</span> ${name}</div><div class="msg-text">${html}</div>`;
+  document.getElementById('rounds').appendChild(el);
+}
 
-  // ENKI
-  setStep('enki','active');
-  await new Promise(r=>setTimeout(r,300));
-  const enkiMatch=ENKI_DB.find(e=>q.toLowerCase().includes(e.topic))||{topic:q,tension:`The nature of "${q}" involves multiple domains.`,synthesis:`Understanding "${q}" requires cross-domain analysis.`,label:'hypothesis'};
-  const enkiConf=Math.min(0.3+cites.length*0.1,0.7);
-  setStep('enki','done');
+function finishPipeline(){
+  const d=pipelineData;
+  const scores=computeScores(d.cites.length,{label:d.enkiMatch.label},{passed:d.advPassed},d.misconceptions,d.noise);
+  const verdict=computeVerdict(scores,d.classification,d.advPassed);
 
-  // ADVERSARY
-  setStep('adversary','active');
-  await new Promise(r=>setTimeout(r,200));
-  const advChallenges=[];
-  if(enkiConf>0.6&&enkiMatch.label!=='fact')advChallenges.push({type:'overclaiming',description:'Confidence exceeds threshold for non-fact synthesis',severity:'high'});
-  if(enkiMatch.label==='analogy')advChallenges.push({type:'weak_analogy',description:'Analogy may not be structurally sound',severity:'medium'});
-  const advPassed=advChallenges.filter(c=>c.severity==='high').length<2;
-  setStep('adversary',advPassed?'done':'attacked');
+  const round={round:1,question:currentQuestion,scribe:{citations:d.cites,confidence:d.scribeConf},enki:{claim:d.enkiMatch.topic,synthesis:d.enkiMatch.synthesis,synthesis_label:d.enkiMatch.label,confidence:d.enkiConf,tensionMap:null},adversary:{passed:d.advPassed,challenges:d.advChallenges,verdict:d.advPassed?'approve':'repent'},misconception:d.misconceptions,noise:d.noise,judge:{verdict:d.judgeVerdict,violatedRules:[],leanCheck:d.cites.length>0},prophet:{riskLevel:d.risk,warnings:[],recommendation:d.risk==='high'?'reject':'proceed'},sentinel:{allowed:d.sentinelAllowed,reason:d.sentinelAllowed?'Passed':'Blocked',classification:d.classification},ledge:d.ledgeResult,scores,verdict};
 
-  // MISCONCEPTION
-  setStep('misconception','active');
-  await new Promise(r=>setTimeout(r,200));
-  const misconceptions=misconceptionCheck(enkiMatch.synthesis);
-  setStep('misconception',misconceptions.length>0?'attacked':'done');
-
-  // NOISE
-  setStep('noise','active');
-  await new Promise(r=>setTimeout(r,200));
-  const noise=noiseCheck(enkiMatch.synthesis);
-  setStep('noise',noise.length>0?'attacked':'done');
-
-  // PROPHET
-  setStep('prophet','active');
-  await new Promise(r=>setTimeout(r,200));
-  const risk=misconceptions.some(m=>m.severity==='high')||noise.some(n=>n.severity==='high')?'high':advChallenges.length>0?'medium':'none';
-  setStep('prophet','done');
-
-  // SENTINEL
-  setStep('sentinel','active');
-  await new Promise(r=>setTimeout(r,200));
-  const classification=classifyClaim(enkiMatch.label,advPassed,misconceptions,noise);
-  const sentinelAllowed=classification!=='misconception'&&classification!=='noise'&&classification!=='blocked';
-  setStep('sentinel',sentinelAllowed?'done':'blocked');
-
-  // LEDGE
-  setStep('ledge','active');
-  let ledgeResult=null;
-  if(sentinelAllowed){await new Promise(r=>setTimeout(r,200));ledgeResult=await sealWorm(`debate_${Date.now().toString(36)}`,'ARENA',q,judgeVerdict,cites.map(c=>c.source));}
-  setStep('ledge',ledgeResult?'done':'blocked');
-
-  const scores=computeScores(cites.length,{label:enkiMatch.label},{passed:advPassed},misconceptions,noise);
-  const verdict=computeVerdict(scores,classification,advPassed);
-
-  const round={round:1,question:q,scribe:{citations:cites,confidence:scribeConf},enki:{claim:enkiMatch.topic,synthesis:enkiMatch.synthesis,synthesis_label:enkiMatch.label,confidence:enkiConf,tensionMap:null},adversary:{passed:advPassed,challenges:advChallenges,verdict:advPassed?'approve':'repent'},misconception:misconceptions,noise,judge:{verdict:judgeVerdict,violatedRules:[],leanCheck:cites.length>0},prophet:{riskLevel:risk,warnings:[],recommendation:risk==='high'?'reject':'proceed'},sentinel:{allowed:sentinelAllowed,reason:sentinelAllowed?'Passed':'Blocked',classification},ledge:ledgeResult,scores,verdict};
-
-  loading.classList.remove('visible');
+  document.getElementById('loading').classList.remove('visible');
+  const scoresEl=document.getElementById('scores');
   scoresEl.style.display='flex';
-  verdictBar.style.display='flex';
+  document.getElementById('verdict-bar').style.display='flex';
 
   document.getElementById('sc-ev').textContent=scores.evidence;document.getElementById('sc-ev').className='score-value '+scoreClass(scores.evidence);
   document.getElementById('sc-lg').textContent=scores.logic;document.getElementById('sc-lg').className='score-value '+scoreClass(scores.logic);
@@ -347,16 +445,44 @@ async function runDebate(){
 
   document.getElementById('final-verdict').textContent=verdict.replace(/_/g,' ');
   document.getElementById('final-verdict').className='verdict-value '+verdict;
-  document.getElementById('total-claims').textContent='1 claim · '+classification;
+  document.getElementById('total-claims').textContent='1 claim · '+d.classification;
 
   renderRound(round);
+  debateMode='idle';
+  showStepButtons('idle');
 }
 
-document.querySelectorAll('.example').forEach(el=>{el.addEventListener('click',()=>{document.getElementById('question').value=el.dataset.q;runDebate();});});
-document.getElementById('debate-btn').addEventListener('click',runDebate);
-document.getElementById('step-btn').addEventListener('click',runDebate);
-document.getElementById('auto-btn').addEventListener('click',runDebate);
-document.getElementById('question').addEventListener('keydown',e=>{if(e.key==='Enter')runDebate();});
+async function startDebate(mode){
+  const q=document.getElementById('question').value.trim();if(!q)return;
+  if(debateMode!=='idle')cancelPipeline();
+  currentQuestion=q;
+  debateMode=mode;
+  pipelineSteps=['scribe','judge','enki','adversary','misconception','noise','prophet','sentinel','ledge'];
+  stepIndex=0;
+  pipelineData={};
+
+  document.getElementById('rounds').innerHTML='';
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('scores').style.display='none';
+  document.getElementById('verdict-bar').style.display='none';
+  document.querySelectorAll('.pipe-step').forEach(el=>el.className='pipe-step');
+
+  showStepButtons(mode);
+  await advanceStep();
+}
+
+document.querySelectorAll('.example').forEach(el=>{el.addEventListener('click',()=>{document.getElementById('question').value=el.dataset.q;startDebate('debate');});});
+document.getElementById('debate-btn').addEventListener('click',()=>{if(debateMode==='idle')startDebate('debate');});
+document.getElementById('step-btn').addEventListener('click',()=>{
+  if(debateMode==='idle')startDebate('step');
+  else if(debateMode==='step'){advanceStep();}
+  else if(debateMode==='auto'){cancelPipeline();startDebate('step');}
+});
+document.getElementById('auto-btn').addEventListener('click',()=>{
+  if(debateMode==='idle')startDebate('auto');
+  else if(debateMode==='step'||debateMode==='auto')cancelPipeline();
+});
+document.getElementById('question').addEventListener('keydown',e=>{if(e.key==='Enter'){if(debateMode==='idle')startDebate('debate');}});
 </script>
 </body>
 </html>
