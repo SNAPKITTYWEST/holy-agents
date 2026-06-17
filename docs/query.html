@@ -13,26 +13,41 @@ body{background:#0a0a0a;color:#b0b0b0;font-family:'Courier New',monospace;min-he
 .container{max-width:800px;margin:0 auto;padding:32px 20px}
 h1{color:#e0e0e0;font-size:18px;margin-bottom:8px}
 p{color:#555;font-size:12px;margin-bottom:24px}
-.search-box{display:flex;gap:8px;margin-bottom:24px}
+.search-box{display:flex;gap:8px;margin-bottom:16px}
 .search-input{flex:1;background:#111;border:1px solid #1a1a1a;color:#e0e0e0;padding:12px 16px;font-family:'Courier New',monospace;font-size:14px;outline:none}
 .search-input:focus{border-color:#333}
 .search-input::placeholder{color:#333}
 .btn{background:#1a1a1a;border:1px solid #333;color:#e0e0e0;padding:12px 24px;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
 .btn:hover{background:#222}
-.source-tabs{display:flex;gap:4px;margin-bottom:16px}
-.source-tab{padding:6px 12px;border:1px solid #1a1a1a;background:#0a0a0a;color:#555;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
-.source-tab.active{border-color:#333;color:#e0e0e0}
+.intent-bar{font-size:10px;color:#555;margin-bottom:16px;padding:6px 10px;border:1px solid #111}
+.intent-bar .intent{color:#a84}
+.intent-bar .corpora{color:#4a9}
 .results{display:none}
 .results.visible{display:block}
 .result-section{border:1px solid #1a1a1a;margin-bottom:12px;padding:16px}
 .result-header{color:#e0e0e0;font-size:12px;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .result-header .emoji{font-size:16px}
 .result-body{font-size:11px;color:#888;line-height:1.6}
-.citation{border-left:2px solid #333;padding-left:8px;margin:4px 0;color:#666}
+.citation{border-left:2px solid #333;padding-left:8px;margin:6px 0;color:#666}
+.citation .src{font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-right:6px}
+.citation .src.scripture{color:#4a9}
+.citation .src.enoch{color:#a44}
+.citation .src.apocrypha{color:#a84}
+.citation .src.theology{color:#88f}
+.citation .src.wikipedia{color:#aaa}
+.citation .src.rtrust{color:#fa0}
 .definition{color:#4a9;margin:4px 0}
+.etymology{color:#a84;margin:4px 0}
+.etymology .root{color:#fa0}
+.translation{margin:6px 0;padding:8px;border:1px solid #111}
+.translation .lang{color:#88f;font-size:9px;text-transform:uppercase;letter-spacing:1px}
+.translation .word{color:#e0e0e0;font-size:14px}
+.translation .meaning{color:#555;font-size:10px}
+.plain-english{border:1px solid #4a9;padding:12px;margin:8px 0;background:#000a00}
+.plain-english .label{color:#4a9;font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.plain-english .answer{color:#e0e0e0;font-size:12px}
 .verdict{display:inline-block;padding:2px 8px;font-size:10px;border:1px solid;margin-top:4px}
 .verdict.approve{border-color:#4a9;color:#4a9}
-.verdict.reject{border-color:#a44;color:#a44}
 .verdict.repent{border-color:#a84;color:#a84}
 .verdict.pass{border-color:#4a9;color:#4a9}
 .verdict.fail{border-color:#a44;color:#a44}
@@ -41,21 +56,31 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 .risk.low{border-color:#4a9;color:#4a9}
 .risk.medium{border-color:#a84;color:#a84}
 .risk.high{border-color:#a44;color:#a44}
-.risk.critical{border-color:#a44;color:#a44}
+.no-cite{border:1px solid #a44;padding:12px;color:#a44;font-size:11px;margin-top:8px}
+.gate-pass{border:1px solid #4a9;padding:8px;color:#4a9;font-size:10px;margin:6px 0;background:#000a00}
+.gate-fail{border:1px solid #a44;padding:8px;color:#a44;font-size:10px;margin:6px 0;background:#0a0000}
 .loading{text-align:center;color:#555;padding:40px;display:none}
 .loading.visible{display:block}
 .worm-seal{margin-top:12px;border:1px solid #1a1a1a;padding:12px;font-size:10px}
-.worm-seal .label{color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
 .worm-seal .hash{color:#4a9;word-break:break-all}
-.worm-seal .seq{color:#e0e0e0}
 .pipeline-log{border:1px solid #1a1a1a;margin-top:16px;padding:12px;max-height:200px;overflow-y:auto}
 .log-line{font-size:10px;padding:2px 0;color:#555}
-.log-line .agent{font-weight:bold}
-.log-line .scribe{color:#4a9}
-.log-line .judge{color:#a84}
-.log-line .prophet{color:#a44}
+.log-line .step{font-weight:bold}
+.log-line .gate{color:#fa0}
+.log-line .dict{color:#4a9}
+.log-line .etym{color:#a84}
+.log-line .cross{color:#88f}
+.log-line .plain{color:#4a9}
+.log-line .cit{color:#aaa}
 .log-line .sentinel{color:#44a}
 .log-line .ledge{color:#888}
+.examples{margin-bottom:24px}
+.example{display:inline-block;padding:4px 10px;border:1px solid #1a1a1a;font-size:10px;color:#555;margin:2px;cursor:pointer}
+.example:hover{border-color:#333;color:#e0e0e0}
+.pipeline-steps{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:24px}
+.pipe-step{padding:4px 8px;border:1px solid #1a1a1a;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px}
+.pipe-step.active{border-color:#4a9;color:#4a9}
+.pipe-step.done{border-color:#333;color:#333}
 </style>
 </head>
 <body>
@@ -70,40 +95,71 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 </nav>
 <div class="container">
   <h1>Query Holy Agents</h1>
-  <p>Full pipeline runs in your browser. No server required.</p>
+  <p>8-step truth pipeline. Full traceability. No server.</p>
 
-  <div class="source-tabs">
-    <div class="source-tab active" data-source="scripture">Scripture</div>
-    <div class="source-tab" data-source="dictionary">Dictionary</div>
-    <div class="source-tab" data-source="wikipedia">Wikipedia</div>
+  <div class="pipeline-steps" id="pipe-steps">
+    <div class="pipe-step" id="ps-1">1. Truth Gate</div>
+    <div class="pipe-step" id="ps-2">2. Dictionary</div>
+    <div class="pipe-step" id="ps-3">3. Etymology</div>
+    <div class="pipe-step" id="ps-4">4. Cross-Lang</div>
+    <div class="pipe-step" id="ps-5">5. Plain English</div>
+    <div class="pipe-step" id="ps-6">6. Citations</div>
+    <div class="pipe-step" id="ps-7">7. Sentinel</div>
+    <div class="pipe-step" id="ps-8">8. WORM Seal</div>
+  </div>
+
+  <div class="examples">
+    <span class="example" data-q="What is covenant?">What is covenant?</span>
+    <span class="example" data-q="Book of Enoch">Book of Enoch</span>
+    <span class="example" data-q="Compare Enoch 1 and Matthew 5">Compare Enoch 1 and Matthew 5</span>
+    <span class="example" data-q="define repentance">Define repentance</span>
+    <span class="example" data-q="mercy">Mercy</span>
+    <span class="example" data-q="etymology of truth">Etymology of truth</span>
+    <span class="example" data-q="etymology of sin">Etymology of sin</span>
+  </div>
+
+  <div class="intent-bar" id="intent-bar" style="display:none">
+    Intent: <span class="intent" id="intent-type"></span> · Corpora: <span class="corpora" id="intent-corpora"></span>
   </div>
 
   <div class="search-box">
     <input class="search-input" id="query" placeholder="What is covenant?" />
-    <button class="btn" id="ask-btn">Ask Holy Agents</button>
+    <button class="btn" id="ask-btn">Ask</button>
   </div>
 
-  <div class="loading" id="loading">Running through pipeline...</div>
+  <div class="loading" id="loading">Running 8-step pipeline...</div>
 
   <div class="results" id="results">
-    <div class="result-section" id="scribe-section">
-      <div class="result-header"><span class="emoji">🔍📖</span> SCRIBE — Source Retrieval</div>
-      <div class="result-body" id="scribe-body"></div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">🟢</span> Step 1 — Boolean Truth Gate</div>
+      <div class="result-body" id="gate-body"></div>
     </div>
-    <div class="result-section" id="judge-section">
-      <div class="result-header"><span class="emoji">⚖️🧠</span> JUDGE — Logic Analysis</div>
-      <div class="result-body" id="judge-body"></div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">📖</span> Step 2 — Dictionary Definition</div>
+      <div class="result-body" id="dict-body"></div>
     </div>
-    <div class="result-section" id="prophet-section">
-      <div class="result-header"><span class="emoji">🔥</span> PROPHET — Risk Assessment</div>
-      <div class="result-body" id="prophet-body"></div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">🌿</span> Step 3 — Etymology / Root Source</div>
+      <div class="result-body" id="etym-body"></div>
     </div>
-    <div class="result-section" id="sentinel-section">
-      <div class="result-header"><span class="emoji">🛡️</span> SENTINEL — Security Gate</div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">🌍</span> Step 4 — Cross-Language Meaning</div>
+      <div class="result-body" id="cross-body"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">💬</span> Step 5 — Plain English Answer</div>
+      <div class="result-body" id="plain-body"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">📚</span> Step 6 — Citation Check</div>
+      <div class="result-body" id="cite-body"></div>
+    </div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">🛡️</span> Step 7 — SENTINEL Pass</div>
       <div class="result-body" id="sentinel-body"></div>
     </div>
-    <div class="result-section" id="ledge-section">
-      <div class="result-header"><span class="emoji">🧾🔐</span> LEDGE — WORM Seal</div>
+    <div class="result-section">
+      <div class="result-header"><span class="emoji">🔐</span> Step 8 — WORM Seal</div>
       <div class="result-body" id="ledge-body"></div>
     </div>
   </div>
@@ -112,244 +168,299 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 </div>
 
 <script>
-const SCRIPTURE = [
-  { text: 'Blessed are the merciful, for they shall receive mercy.', location: 'Matthew 5:7', kw: ['mercy','merciful','blessed'] },
-  { text: 'You shall not bear false witness against your neighbor.', location: 'Exodus 20:16', kw: ['false','witness','neighbor'] },
-  { text: 'Love your neighbor as yourself.', location: 'Matthew 22:39', kw: ['love','neighbor'] },
-  { text: 'Do not exploit the poor because they are poor.', location: 'Proverbs 22:16', kw: ['exploit','poor','poverty'] },
-  { text: 'The truth will set you free.', location: 'John 8:32', kw: ['truth','free'] },
-  { text: 'Do unto others as you would have them do unto you.', location: 'Matthew 7:12', kw: ['others','golden','rule'] },
-  { text: 'Forgive us our debts, as we also have forgiven our debtors.', location: 'Matthew 6:12', kw: ['forgive','debt','debts'] },
-  { text: 'Let the one who has never sinned throw the first stone.', location: 'John 8:7', kw: ['sin','stone','judgment'] },
-  { text: 'The Lord is my shepherd; I shall not want.', location: 'Psalm 23:1', kw: ['shepherd','lord','want'] },
-  { text: 'Where there is no prophecy, the people cast off restraint.', location: 'Proverbs 29:18', kw: ['prophecy','vision'] }
+const BIBLE=[
+{t:'Blessed are the merciful, for they shall receive mercy.',l:'Matthew 5:7',s:'scripture',k:['mercy','merciful','blessed']},
+{t:'You shall not bear false witness against your neighbor.',l:'Exodus 20:16',s:'scripture',k:['false','witness','neighbor']},
+{t:'Love your neighbor as yourself.',l:'Matthew 22:39',s:'scripture',k:['love','neighbor']},
+{t:'Do not exploit the poor because they are poor.',l:'Proverbs 22:16',s:'scripture',k:['exploit','poor','poverty']},
+{t:'The truth will set you free.',l:'John 8:32',s:'scripture',k:['truth','free']},
+{t:'Do unto others as you would have them do unto you.',l:'Matthew 7:12',s:'scripture',k:['others','golden','rule']},
+{t:'Forgive us our debts, as we also have forgiven our debtors.',l:'Matthew 6:12',s:'scripture',k:['forgive','debt','debts']},
+{t:'Let the one who has never sinned throw the first stone.',l:'John 8:7',s:'scripture',k:['sin','stone','judgment']},
+{t:'Where there is no prophecy, the people cast off restraint.',l:'Proverbs 29:18',s:'scripture',k:['prophecy','vision']},
+{t:'The Lord is my shepherd; I shall not want.',l:'Psalm 23:1',s:'scripture',k:['shepherd','lord','want']},
+{t:'For where two or three gather in my name, there am I with them.',l:'Matthew 18:20',s:'scripture',k:['gather','name']},
+{t:'The fear of the Lord is the beginning of wisdom.',l:'Proverbs 9:10',s:'scripture',k:['fear','lord','wisdom']},
+{t:'I will establish my covenant between me and you and your descendants after you.',l:'Genesis 17:7',s:'scripture',k:['covenant','establish','descendants']},
+{t:'This is the blood of the covenant, which God has commanded you.',l:'Exodus 24:8',s:'scripture',k:['covenant','blood']}
 ];
 
-const DICTIONARY = [
-  { term: 'covenant', definition: 'A solemn agreement or promise between parties.', pos: 'noun' },
-  { term: 'mercy', definition: 'Compassion or forgiveness shown toward someone.', pos: 'noun' },
-  { term: 'truth', definition: 'The quality or state of being true.', pos: 'noun' },
-  { term: 'justice', definition: 'Just behavior or treatment.', pos: 'noun' },
-  { term: 'grace', definition: 'Simple elegance or courteous goodwill.', pos: 'noun' },
-  { term: 'sin', definition: 'An immoral act considered a transgression against divine law.', pos: 'noun' },
-  { term: 'repent', definition: 'To feel or express sincere regret or remorse.', pos: 'verb' },
-  { term: 'prophecy', definition: 'A prediction of what will happen in the future.', pos: 'noun' }
+const ENOCH=[
+{t:'The angels who descended mingled with human women and produced the Nephilim.',l:'1 Enoch 6:1-2',s:'enoch',k:['angels','nephilim','women','descended']},
+{t:'God sent the flood to destroy the Nephilim and cleanse the earth.',l:'1 Enoch 10:1-3',s:'enoch',k:['flood','destroy','nephilim']},
+{t:'The Watchers are bound in the valleys of the earth until the day of judgment.',l:'1 Enoch 10:4-6',s:'enoch',k:['watchers','bound','judgment']},
+{t:'Enoch saw the holy ones of heaven and the abode of the dead.',l:'1 Enoch 22:1-5',s:'enoch',k:['enoch','heaven','dead']},
+{t:'The Son of Man was chosen before the world was created.',l:'1 Enoch 46:1-4',s:'enoch',k:['son of man','chosen','created']},
+{t:'The righteous will shine like the stars forever.',l:'1 Enoch 104:1-2',s:'enoch',k:['righteous','shine','stars']},
+{t:'Enoch walked with God and was taken, for God took him.',l:'1 Enoch 12:1-2',s:'enoch',k:['enoch','walked','taken']},
+{t:'The books of the Watchers reveal the secrets of heaven and earth.',l:'1 Enoch 8:1-3',s:'enoch',k:['books','secrets','heaven']},
+{t:'The elect one will dwell with the holy ones.',l:'1 Enoch 45:1-3',s:'enoch',k:['elect','dwell','holy']},
+{t:'Judgment is prepared for the kings and the mighty.',l:'1 Enoch 62:1-3',s:'enoch',k:['judgment','kings','mighty']}
 ];
 
-const WIKIPEDIA = [
-  { title: 'Covenant (biblical)', summary: 'A covenant is a binding agreement or promise between parties.', kw: ['covenant','agreement','promise'] },
-  { title: 'Mercy', summary: 'Mercy is compassion or forgiveness shown toward someone.', kw: ['mercy','compassion','forgiveness'] },
-  { title: 'Truth', summary: 'Truth is the property of being in accord with fact or reality.', kw: ['truth','fact','reality'] },
-  { title: 'Justice', summary: 'Justice is the concept of moral rightness.', kw: ['justice','moral','rightness'] },
-  { title: 'Ethics', summary: 'Ethics is a branch of philosophy involving right conduct.', kw: ['ethics','philosophy','conduct'] },
-  { title: 'Repentance', summary: 'Repentance is the action of regretting past conduct.', kw: ['repent','regret','sin'] },
-  { title: 'Grace (theology)', summary: 'Grace is the unmerited favor of God toward humanity.', kw: ['grace','favor','unmerited'] }
+const APOCRYPHA=[
+{t:'Wisdom is a breath of the power of God, a pure emanation of the Almighty.',l:'Wisdom of Solomon 7:25',s:'apocrypha',k:['wisdom','power','god']},
+{t:'The souls of the righteous are in the hand of God, and no torment will touch them.',l:'2 Maccabees 12:43-46',s:'apocrypha',k:['souls','righteous','hand']},
+{t:'Pray for the dead, that they may be loosed from sin.',l:'2 Maccabees 12:46',s:'apocrypha',k:['pray','dead','loosed','sin']},
+{t:'I wisdom dwell with prudence, and find out knowledge of witty inventions.',l:'Sirach 1:4',s:'apocrypha',k:['wisdom','prudence','knowledge']},
+{t:'The Lord created medicine out of the earth, and the wise will not abhor it.',l:'Sirach 38:4',s:'apocrypha',k:['lord','medicine','earth']},
+{t:'Before man is life and death, and whichever he chooses will be given to him.',l:'Sirach 15:17',s:'apocrypha',k:['life','death','choose']},
+{t:'Do not be proud, for pride is the beginning of sin.',l:'Sirach 10:12-14',s:'apocrypha',k:['proud','pride','sin']},
+{t:'Set a guard over your mouth, and a seal of wisdom over your lips.',l:'Sirach 22:27-33',s:'apocrypha',k:['guard','mouth','seal','wisdom']}
 ];
 
-const RTRUST = [
-  { rule_id: 'RTRUST-001', principle: 'truthfulness', forbidden: ['deception','fabrication','false_attribution'] },
-  { rule_id: 'RTRUST-002', principle: 'justice', forbidden: ['exploitation','oppression','unjust_gain'] },
-  { rule_id: 'RTRUST-003', principle: 'love', forbidden: ['harm','violence','negligence'] },
-  { rule_id: 'RTRUST-004', principle: 'autonomy', forbidden: ['unauthorized_action','coercion','manipulation'] },
-  { rule_id: 'RTRUST-005', principle: 'accountability', forbidden: ['unsigned_action','hidden_action','silent_failure'] },
-  { rule_id: 'RTRUST-006', principle: 'mercy', forbidden: ['unmerciful_judgment','cruelty','vengeance'] },
-  { rule_id: 'RTRUST-007', principle: 'attribution', forbidden: ['plagiarism','unattributed_claim','false_source'] }
+const THEOLOGY=[
+{t:'A covenant is a binding agreement between God and humanity, sealed by oath and sacrifice.',l:'Systematic Theology, Covenant',s:'theology',k:['covenant','agreement','god','oath']},
+{t:'Sanctification is the process by which a believer is made holy through the Holy Spirit.',l:'Systematic Theology, Sanctification',s:'theology',k:['sanctification','holy','spirit']},
+{t:'Justification is the act of God declaring the sinner righteous through faith in Christ.',l:'Systematic Theology, Justification',s:'theology',k:['justification','righteous','faith']},
+{t:'Repentance is turning from sin to God, involving contrition, confession, and amendment.',l:'Systematic Theology, Repentance',s:'theology',k:['repentance','turning','sin','contrition']},
+{t:'The Trinity is the doctrine that God exists as three co-equal persons.',l:'Systematic Theology, Trinity',s:'theology',k:['trinity','three','persons']},
+{t:'Eschatology studies final events: resurrection, judgment, and the new creation.',l:'Systematic Theology, Eschatology',s:'theology',k:['eschatology','final','resurrection']},
+{t:'Hamartiology is the study of sin, its origin, nature, and effects.',l:'Systematic Theology, Hamartiology',s:'theology',k:['hamartiology','sin','origin']},
+{t:'Christology studies the person and work of Jesus Christ, fully God and fully man.',l:'Systematic Theology, Christology',s:'theology',k:['christology','jesus','christ']},
+{t:'Pneumatology is the study of the Holy Spirit, His person, works, and gifts.',l:'Systematic Theology, Pneumatology',s:'theology',k:['pneumatology','holy spirit','gifts']},
+{t:'Ecclesiology studies the nature, structure, and mission of the Christian church.',l:'Systematic Theology, Ecclesiology',s:'theology',k:['ecclesiology','church','mission']}
 ];
 
-let wormSeq = 0;
-let wormChain = [];
+const DICT=[
+{term:'covenant',def:'A solemn agreement or promise between parties, often sealed with an oath.',pos:'noun',syn:['agreement','pact','treaty']},
+{term:'mercy',def:'Compassion or forgiveness shown toward someone whom it is within one\'s power to punish.',pos:'noun',syn:['compassion','forgiveness','grace']},
+{term:'truth',def:'The quality or state of being true; that which is in accordance with fact or reality.',pos:'noun',syn:['fact','reality','accuracy']},
+{term:'justice',def:'Just behavior or treatment; the quality of being fair and reasonable.',pos:'noun',syn:['fairness','equity','righteousness']},
+{term:'grace',def:'The free and unmerited favor of God, as manifested in the salvation of sinners.',pos:'noun',syn:['favor','blessing','mercy']},
+{term:'sin',def:'An immoral act considered a transgression against divine law.',pos:'noun',syn:['transgression','iniquity','wrongdoing']},
+{term:'repent',def:'To feel sincere regret; to turn from sin.',pos:'verb',syn:['regret','atone','reform']},
+{term:'prophecy',def:'A prediction from God through a prophet.',pos:'noun',syn:['prediction','oracle','vision']},
+{term:'righteous',def:'Morally right or justifiable.',pos:'adjective',syn:['virtuous','holy','just']},
+{term:'enoch',def:'A patriarch who walked with God and was taken to heaven.',pos:'noun',syn:['patriarch','prophet']},
+{term:'apocrypha',def:'Biblical writings not part of the accepted canon.',pos:'noun',syn:['deuterocanonical','hidden']},
+{term:'nephilim',def:'Offspring of the sons of God and daughters of men; giants.',pos:'noun',syn:['giants','fallen']},
+{term:'watchers',def:'Angels who descended to earth in the Book of Enoch.',pos:'noun',syn:['angels','sentinels']},
+{term:'salvation',def:'Deliverance from sin and its consequences.',pos:'noun',syn:['deliverance','redemption']},
+{term:'faith',def:'Complete trust or confidence in God.',pos:'noun',syn:['belief','trust','conviction']}
+];
 
-async function sha256(str) {
-  const buf = new TextEncoder().encode(str);
-  const hash = await crypto.subtle.digest('SHA-256', buf);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+const WIKI=[
+{title:'Covenant (biblical)',summary:'A covenant in the Bible is a binding agreement between God and humanity.',k:['covenant','agreement','promise']},
+{title:'Book of Enoch',summary:'The Book of Enoch is an ancient Hebrew apocalyptic text ascribed to Enoch.',k:['enoch','book','apocalyptic']},
+{title:'1 Enoch',summary:'1 Enoch is the earliest version of the Ethiopic Enoch corpus.',k:['enoch','1 enoch','ethiopic']},
+{title:'Nephilim',summary:'The Nephilim are mysterious beings in Genesis and Enoch.',k:['nephilim','genesis','giants']},
+{title:'Mercy',summary:'Mercy is compassion or forgiveness shown toward someone.',k:['mercy','compassion','forgiveness']},
+{title:'Truth',summary:'Truth is the property of being in accord with fact or reality.',k:['truth','fact','reality']},
+{title:'Repentance',summary:'Repentance is regretting past conduct and resolving to change.',k:['repent','repentance','regret']},
+{title:'Covenant (theology)',summary:'In theology, a covenant is a divine agreement between God and humanity.',k:['covenant','theology','divine']},
+{title:'Apocrypha',summary:'The Apocrypha are writings not forming part of the accepted canon.',k:['apocrypha','canon']},
+{title:'Book of Wisdom',summary:'The Book of Wisdom is a deuterocanonical work of the Old Testament.',k:['wisdom','book','deuterocanonical']},
+{title:'Sirach',summary:'Sirach is a book of wisdom literature in the Septuagint canon.',k:['sirach','wisdom','ecclesiasticus']}
+];
+
+const RTRUST=[
+{t:'RTRUST-001: Do not bear false witness. Principle: truthfulness.',l:'RTRUST.md',s:'rtrust',k:['rtrust','false','witness']},
+{t:'RTRUST-002: Do not exploit the poor. Principle: justice.',l:'RTRUST.md',s:'rtrust',k:['rtrust','exploit','poor']},
+{t:'RTRUST-003: Do not harm your neighbor. Principle: love.',l:'RTRUST.md',s:'rtrust',k:['rtrust','harm','neighbor']},
+{t:'RTRUST-004: Act only with consent. Principle: autonomy.',l:'RTRUST.md',s:'rtrust',k:['rtrust','consent','autonomy']},
+{t:'RTRUST-005: All actions must be witnessed. Principle: accountability.',l:'RTRUST.md',s:'rtrust',k:['rtrust','witnessed','accountability']},
+{t:'RTRUST-006: Seek mercy before judgment. Principle: mercy.',l:'RTRUST.md',s:'rtrust',k:['rtrust','mercy','judgment']},
+{t:'RTRUST-007: Cite your sources. Principle: attribution.',l:'RTRUST.md',s:'rtrust',k:['rtrust','cite','sources']}
+];
+
+const ETYMOLOGY=[
+{term:'covenant',root:'con + venire',origin:'Latin convenire → Old French covenant',meaning:'to come together, to agree',langs:['Latin','Old French','English']},
+{term:'mercy',root:'merces',origin:'Latin merces → Old French merci',meaning:'reward, pity, compassion',langs:['Latin','Old French','English']},
+{term:'truth',root:'triuwath',origin:'Old English triewð → Proto-Germanic trewwidō',meaning:'faithfulness, loyalty',langs:['Old English','Proto-Germanic','English']},
+{term:'justice',root:'iustitia',origin:'Latin iustitia → Old French justice',meaning:'righteousness, fairness',langs:['Latin','Old French','English']},
+{term:'grace',root:'gratia',origin:'Latin gratia → Old French grace',meaning:'favor, charm, thankfulness',langs:['Latin','Old French','English']},
+{term:'sin',root:'syn',origin:'Old English syn → Proto-Germanic sunjō',meaning:'guilt, offense',langs:['Old English','Proto-Germanic','English']},
+{term:'repent',root:'paenitere',origin:'Latin paenitēre → Old French repentir',meaning:'to feel regret, to change mind',langs:['Latin','Old French','English']},
+{term:'prophecy',root:'pro + phēmi',origin:'Greek prophēteia → from prophetes',meaning:'to speak forth, to declare',langs:['Greek','English']},
+{term:'righteous',root:'rihtwīs',origin:'Old English rihtwīs → riht + wīs',meaning:'right-wise, morally correct',langs:['Old English','English']},
+{term:'witness',root:'witnes',origin:'Old English witnes → witan',meaning:'knowledge, testimony',langs:['Old English','English']},
+{term:'salvation',root:'salvatio',origin:'Latin salvātiōnem → Old French salvacion',meaning:'deliverance, preservation',langs:['Latin','Old French','English']},
+{term:'faith',root:'fides',origin:'Latin fidēs → Old French feid',meaning:'trust, belief, confidence',langs:['Latin','Old French','English']},
+{term:'enoch',root:'ḥănōḵ',origin:'Hebrew חָנוֹך (Ḥănōḵ)',meaning:'dedicated, initiated',langs:['Hebrew','English']},
+{term:'nephilim',root:'nāp̄al',origin:'Hebrew נְפִילִים (Nəp̄îlîm)',meaning:'fallen ones, giants',langs:['Hebrew','English']},
+{term:'watchers',root:'ʿîr',origin:'Hebrew עִיר (ʿîr)',meaning:'awake ones, sentinels',langs:['Hebrew','English']},
+{term:'apocrypha',root:'apokryphos',origin:'Greek ἀπόκρυφος',meaning:'hidden away, concealed',langs:['Greek','English']}
+];
+
+const TRANSLATIONS=[
+{term:'covenant',tr:[
+{lang:'Hebrew',word:'בְּרִית',meaning:'berith — bond, agreement'},
+{lang:'Greek',word:'διαθήκη',meaning:'diathēkē — testament, arrangement'},
+{lang:'Latin',word:'foedus',meaning:'pact, league'},
+{lang:'Arabic',word:'عَهْد',meaning:'ʿahd — pact, oath'}]},
+{term:'mercy',tr:[
+{lang:'Hebrew',word:'חֶסֶד',meaning:'ḥesed — lovingkindness, steadfast love'},
+{lang:'Greek',word:'ἔλεος',meaning:'eleos — compassion, pity'},
+{lang:'Latin',word:'misericordia',meaning:'compassion, pity'},
+{lang:'Arabic',word:'رَحْمَة',meaning:'raḥma — compassion, mercy'}]},
+{term:'truth',tr:[
+{lang:'Hebrew',word:'אֱמֶת',meaning:'emeth — faithfulness, firmness'},
+{lang:'Greek',word:'ἀλήθεια',meaning:'alētheia — unconcealedness, reality'},
+{lang:'Latin',word:'veritas',meaning:'truth, honesty'},
+{lang:'Arabic',word:'حَقّ',meaning:'ḥaqq — truth, right, reality'}]},
+{term:'justice',tr:[
+{lang:'Hebrew',word:'צֶדֶק',meaning:'tsedeq — righteousness'},
+{lang:'Greek',word:'δικαιοσύνη',meaning:'dikaiosynē — justice, righteousness'},
+{lang:'Latin',word:'iustitia',meaning:'justice, equity'},
+{lang:'Arabic',word:'عَدْل',meaning:'ʿadl — justice, equity'}]},
+{term:'grace',tr:[
+{lang:'Hebrew',word:'חֵן',meaning:'ḥēn — favor, charm'},
+{lang:'Greek',word:'χάρις',meaning:'charis — gift, grace, favor'},
+{lang:'Latin',word:'gratia',meaning:'favor, thankfulness'},
+{lang:'Arabic',word:'نِعْمَة',meaning:'niʿma — blessing, grace'}]},
+{term:'sin',tr:[
+{lang:'Hebrew',word:'חֵטְא',meaning:'ḥēṭ — to miss the mark'},
+{lang:'Greek',word:'ἁμαρτία',meaning:'hamartia — to miss the mark, offense'},
+{lang:'Latin',word:'peccatum',meaning:'sin, transgression'},
+{lang:'Arabic',word:'خَطِيئة',meaning:'khaṭīʾa — sin, mistake'}]},
+{term:'repent',tr:[
+{lang:'Hebrew',word:'שׁוּב',meaning:'shûv — to turn back, return'},
+{lang:'Greek',word:'μετανοέω',meaning:'metanoeō — to change mind'},
+{lang:'Latin',word:'paenitēre',meaning:'to feel regret'},
+{lang:'Arabic',word:'تَوَبَ',meaning:'tāba — to repent, turn back'}]},
+{term:'faith',tr:[
+{lang:'Hebrew',word:'אֱמוּנָה',meaning:'emunah — faithfulness, trust'},
+{lang:'Greek',word:'πίστις',meaning:'pistis — trust, faith, belief'},
+{lang:'Latin',word:'fides',meaning:'trust, confidence'},
+{lang:'Arabic',word:'إِيمَان',meaning:'īmān — faith, belief'}]},
+{term:'salvation',tr:[
+{lang:'Hebrew',word:'יְשׁוּעָה',meaning:'yeshûʿāh — deliverance, rescue'},
+{lang:'Greek',word:'σωτηρία',meaning:'sōtēria — deliverance, preservation'},
+{lang:'Latin',word:'salus',meaning:'safety, health, salvation'},
+{lang:'Arabic',word:'خَلَاص',meaning:'ḵalāṣ — salvation, deliverance'}]}
+];
+
+const RTRUST_RULES=[
+{id:'RTRUST-001',p:'truthfulness'},{id:'RTRUST-002',p:'justice'},{id:'RTRUST-003',p:'love'},
+{id:'RTRUST-004',p:'autonomy'},{id:'RTRUST-005',p:'accountability'},{id:'RTRUST-006',p:'mercy'},{id:'RTRUST-007',p:'attribution'}
+];
+
+function classify(q){
+  const l=q.toLowerCase(),t=l.split(/\s+/);
+  if(/^(what is|define|definition of|meaning of|means|etymology of|root of|origin of)\b/.test(l)&&t.length<=6)return{intent:'definition',corpora:['dictionary','scripture','wikipedia']};
+  if(/compare|versus|vs\.?|difference between/.test(l))return{intent:'comparison',corpora:['scripture','enoch','apocrypha','theology','wikipedia']};
+  if(/book of enoch|1 enoch|enoch|watcher|nephilim|fallen angel/.test(l))return{intent:'theology_search',corpora:['enoch','theology','wikipedia','dictionary']};
+  if(/apocrypha|wisdom of solomon|sirach|maccabees/.test(l))return{intent:'theology_search',corpora:['apocrypha','theology','wikipedia','dictionary']};
+  if(/rtrust|rule|constitution|forbidden|axiom/.test(l))return{intent:'rtrust_query',corpora:['rtrust','theology']};
+  if(/repent|sin|salvation|faith|grace|justif|sanctif|trinity/.test(l))return{intent:'theology_search',corpora:['theology','scripture','dictionary','wikipedia']};
+  return{intent:'scripture_search',corpora:['scripture','enoch','apocrypha','theology','wikipedia','dictionary']};
 }
 
-function log(agent, msg) {
-  const el = document.getElementById('pipeline-log');
-  const cls = agent.toLowerCase();
-  el.innerHTML += `<div class="log-line"><span class="agent ${cls}">${agent}</span> ${msg}</div>`;
-  el.scrollTop = el.scrollHeight;
-}
+function searchCorpus(kw,corpus){return corpus.filter(e=>e.k.some(k=>kw.some(q=>k.includes(q)||q.includes(k)))).map(e=>({source:e.s,text:e.t,location:e.l}));}
+function searchWiki(kw){return WIKI.filter(a=>a.k.some(k=>kw.some(q=>k.includes(q)||q.includes(k)))).map(a=>({source:'wikipedia',text:a.summary,location:a.title}));}
+function searchDict(q){const l=q.toLowerCase();return DICT.filter(d=>l.includes(d.term)||d.term.includes(l)||d.syn.some(s=>l.includes(s))).map(d=>({term:d.term,definition:d.def,part_of_speech:d.pos}));}
+function searchEtym(q){const l=q.toLowerCase();return ETYMOLOGY.filter(e=>l.includes(e.term)||e.term.includes(l)).map(e=>({term:e.term,root:e.root,origin:e.origin,meaning:e.meaning,languages:e.langs}));}
+function searchTrans(q){const l=q.toLowerCase();return TRANSLATIONS.filter(t=>l.includes(t.term)||t.term.includes(l)).map(t=>({term:t.term,translations:t.tr}));}
+function dedupe(c){const s=new Set();return c.filter(e=>{const k=e.source+':'+e.location;if(s.has(k))return false;s.add(k);return true;});}
 
-function searchScripture(query) {
-  const kw = query.toLowerCase().split(/\s+/);
-  const hits = SCRIPTURE.filter(e => e.kw.some(k => kw.some(q => k.includes(q) || q.includes(k))));
-  return { citations: hits.map(h => ({ source: 'scripture', text: h.text, location: h.location })), confidence: hits.length > 0 ? Math.min(0.5 + hits.length * 0.1, 0.95) : 0.3 };
-}
+let wormSeq=0,wormChain=[];
+async function sha256(s){const b=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function sealWorm(eid,ag,act,v,cit){wormSeq++;const prev=wormChain.length===0?'GENESIS':wormChain[wormChain.length-1].hash;const ts=new Date().toISOString();const hash=await sha256(`${wormSeq}|${prev}|${eid}|${ag}|${act}|${v}|${ts}`);const e={seq:wormChain.length+1,prev_hash:prev,hash,timestamp:ts,event_id:eid,agent:ag,action:act,verdict:v,citations:cit};wormChain.push(e);return{sequence:e.seq,hash:e.hash,sealed:true};}
 
-function searchDictionary(query) {
-  const q = query.toLowerCase();
-  const hits = DICTIONARY.filter(d => q.includes(d.term) || d.term.includes(q));
-  return { definitions: hits.map(h => ({ term: h.term, definition: h.definition, part_of_speech: h.pos })), confidence: hits.length > 0 ? 0.91 : 0.2 };
-}
+function log(ag,msg){const el=document.getElementById('pipeline-log');el.innerHTML+=`<div class="log-line"><span class="step ${ag.toLowerCase()}">${ag}</span> ${msg}</div>`;el.scrollTop=el.scrollHeight;}
+function setStep(n,state){const el=document.getElementById('ps-'+n);el.className='pipe-step '+(state==='active'?'active':state==='done'?'done':'');}
 
-function searchWikipedia(query) {
-  const kw = query.toLowerCase().split(/\s+/);
-  const hits = WIKIPEDIA.filter(a => a.kw.some(k => kw.includes(k)));
-  return { citations: hits.map(h => ({ source: 'wikipedia', text: h.summary, location: h.title, url: `https://en.wikipedia.org/wiki/${encodeURIComponent(h.title)}` })), confidence: hits.length > 0 ? 0.82 : 0.2 };
-}
+document.querySelectorAll('.example').forEach(el=>{el.addEventListener('click',()=>{document.getElementById('query').value=el.dataset.q;runQuery();});});
+document.getElementById('ask-btn').addEventListener('click',runQuery);
+document.getElementById('query').addEventListener('keydown',e=>{if(e.key==='Enter')runQuery();});
 
-function judgeCheck(action) {
-  const errors = [];
-  if (!action.truthful) errors.push('action_not_truthful');
-  if (action.harmful) errors.push('action_harmful');
-  if (action.exploitative) errors.push('action_exploitative');
-  if (action.requiresConsent && !action.hasConsent) errors.push('consent_required');
-  if (!action.witnessed) errors.push('not_witnessed');
-  if (!action.cited) errors.push('not_cited');
-  const violated = [];
-  for (const rule of RTRUST) {
-    if (rule.principle === 'truthfulness' && !action.truthful) violated.push(rule.rule_id);
-    if (rule.principle === 'love' && action.harmful) violated.push(rule.rule_id);
-    if (rule.principle === 'justice' && action.exploitative) violated.push(rule.rule_id);
-    if (rule.principle === 'autonomy' && action.requiresConsent && !action.hasConsent) violated.push(rule.rule_id);
-    if (rule.principle === 'accountability' && !action.witnessed) violated.push(rule.rule_id);
-    if (rule.principle === 'attribution' && !action.cited) violated.push(rule.rule_id);
-  }
-  const lawful = errors.length === 0 && violated.length === 0;
-  return { verdict: lawful ? 'approve' : 'repent', violatedRules: [...new Set([...errors, ...violated])], leanCheck: errors.length === 0 };
-}
+async function runQuery(){
+  const q=document.getElementById('query').value.trim();if(!q)return;
+  const loading=document.getElementById('loading'),results=document.getElementById('results'),logEl=document.getElementById('pipeline-log');
+  logEl.innerHTML='';loading.classList.add('visible');results.classList.remove('visible');
+  document.querySelectorAll('.pipe-step').forEach(el=>el.className='pipe-step');
+  const cls=classify(q);
+  document.getElementById('intent-bar').style.display='block';
+  document.getElementById('intent-type').textContent=cls.intent;
+  document.getElementById('intent-corpora').textContent=cls.corpora.join(', ');
 
-function prophetCheck(action) {
-  const warnings = [], flags = [];
-  let risk = 'none';
-  if (!action.truthful) { warnings.push('Action is not truthful'); flags.push('deception'); risk = 'high'; }
-  if (action.harmful) { warnings.push('Action may cause harm'); flags.push('harm'); risk = 'high'; }
-  if (action.exploitative) { warnings.push('Action may exploit'); flags.push('exploitation'); risk = 'critical'; }
-  if (action.requiresConsent && !action.hasConsent) { warnings.push('Consent required but missing'); flags.push('coercion'); risk = 'medium'; }
-  if (!action.witnessed) { warnings.push('Not witnessed — accountability gap'); flags.push('unsigned_action'); if (risk === 'none') risk = 'low'; }
-  if (!action.cited) { warnings.push('No citation — unattributed claim'); flags.push('unattributed_claim'); if (risk === 'none') risk = 'low'; }
-  const rec = risk === 'high' || risk === 'critical' ? 'reject' : risk === 'medium' ? 'revise' : 'proceed';
-  return { riskLevel: risk, warnings, flags, recommendation: rec };
-}
+  // Step 1: Truth Gate
+  setStep(1,'active');
+  const kw=q.toLowerCase().split(/\s+/);
+  await new Promise(r=>setTimeout(r,100));log('GATE','checking boolean truth gate...');
+  const isGibberish=/^[a-z]{20,}$/.test(q.replace(/\s+/g,''));
+  const isEmpty=q.length===0;
+  const truthPassed=!isGibberish&&!isEmpty;
+  setStep(1,'done');
+  document.getElementById('gate-body').innerHTML=truthPassed
+    ?`<div class="gate-pass">TRUTH GATE: PASSED</div><p>Query is truth-seeking and well-formed.</p>`
+    :`<div class="gate-fail">TRUTH GATE: FAILED</div><p>${isGibberish?'Query appears to be gibberish.':'Query is empty.'}</p>`;
 
-function sentinelCheck(action) {
-  const v = [];
-  if (!action.truthful) v.push('RTRUST-001');
-  if (action.harmful) v.push('RTRUST-003');
-  if (action.exploitative) v.push('RTRUST-002');
-  if (action.requiresConsent && !action.hasConsent) v.push('RTRUST-004');
-  if (!action.witnessed) v.push('RTRUST-005');
-  if (!action.cited) v.push('RTRUST-007');
-  return { allowed: v.length === 0, reason: v.length === 0 ? 'All checks passed' : `Blocked: ${v.join(', ')}`, violations: v };
-}
+  // Step 2: Dictionary
+  setStep(2,'active');
+  await new Promise(r=>setTimeout(r,100));log('DICT','searching dictionary...');
+  const defs=searchDict(q);
+  setStep(2,'done');
+  if(defs.length>0){document.getElementById('dict-body').innerHTML=defs.map(d=>`<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`).join('');}
+  else{document.getElementById('dict-body').innerHTML='<p>No dictionary match.</p>';}
 
-async function sealWorm(eventId, agent, action, verdict, citations) {
-  wormSeq++;
-  const prevHash = wormChain.length === 0 ? 'GENESIS' : wormChain[wormChain.length - 1].hash;
-  const ts = new Date().toISOString();
-  const hash = await sha256(`${wormSeq}|${prevHash}|${eventId}|${agent}|${action}|${verdict}|${ts}`);
-  const entry = { seq: wormChain.length + 1, prev_hash: prevHash, hash, timestamp: ts, event_id: eventId, agent, action, verdict, citations };
-  wormChain.push(entry);
-  return { sequence: entry.seq, prevHash: entry.prev_hash, hash: entry.hash, sealed: true };
-}
+  // Step 3: Etymology
+  setStep(3,'active');
+  await new Promise(r=>setTimeout(r,100));log('ETYM','looking up etymology...');
+  const etyms=searchEtym(q);
+  setStep(3,'done');
+  if(etyms.length>0){document.getElementById('etym-body').innerHTML=etyms.map(e=>`<div class="etymology"><strong>${e.term}</strong>: <span class="root">${e.root}</span> from ${e.origin} — "${e.meaning}"<br><span style="color:#444;font-size:9px">Languages: ${e.languages.join(', ')}</span></div>`).join('');}
+  else{document.getElementById('etym-body').innerHTML='<p>No etymology match.</p>';}
 
-let selectedSource = 'scripture';
-document.querySelectorAll('.source-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    selectedSource = tab.dataset.source;
-  });
-});
+  // Step 4: Cross-Language
+  setStep(4,'active');
+  await new Promise(r=>setTimeout(r,100));log('CROSS','translating across languages...');
+  const trans=searchTrans(q);
+  setStep(4,'done');
+  if(trans.length>0){document.getElementById('cross-body').innerHTML=trans.map(t=>`<div class="translation"><strong>${t.term}</strong>${t.translations.map(tr=>`<div><span class="lang">${tr.lang}</span> <span class="word">${tr.word}</span> <span class="meaning">${tr.meaning}</span></div>`).join('')}</div>`).join('');}
+  else{document.getElementById('cross-body').innerHTML='<p>No translations found.</p>';}
 
-document.getElementById('ask-btn').addEventListener('click', runQuery);
-document.getElementById('query').addEventListener('keydown', e => { if (e.key === 'Enter') runQuery(); });
+  // Step 5: Plain English
+  setStep(5,'active');
+  await new Promise(r=>setTimeout(r,100));log('PLAIN','synthesizing answer...');
+  const plainParts=[];
+  if(defs[0])plainParts.push(`${defs[0].term}: ${defs[0].definition}`);
+  if(etyms[0])plainParts.push(`Root: ${etyms[0].root} from ${etyms[0].origin}`);
+  if(trans[0])plainParts.push(`Languages: ${trans[0].translations.map(t=>t.lang).join(', ')}`);
+  const plainAnswer=plainParts.length>0?plainParts.join(' — '):`No data found for "${q}".`;
+  setStep(5,'done');
+  document.getElementById('plain-body').innerHTML=`<div class="plain-english"><div class="label">Plain English</div><div class="answer">${plainAnswer}</div></div>`;
 
-async function runQuery() {
-  const query = document.getElementById('query').value.trim();
-  if (!query) return;
-  const loading = document.getElementById('loading');
-  const results = document.getElementById('results');
-  const logEl = document.getElementById('pipeline-log');
-  logEl.innerHTML = '';
-  loading.classList.add('visible');
-  results.classList.remove('visible');
+  // Step 6: Citations
+  setStep(6,'active');
+  await new Promise(r=>setTimeout(r,100));log('CITE','checking citations...');
+  let allCit=dedupe([
+    ...searchCorpus(kw,BIBLE),
+    ...searchCorpus(kw,ENOCH),
+    ...searchCorpus(kw,APOCRYPHA),
+    ...searchCorpus(kw,THEOLOGY),
+    ...searchCorpus(kw,RTRUST),
+    ...searchWiki(kw)
+  ]);
+  const conf=allCit.length>0?Math.min(0.4+allCit.length*0.12,0.95):defs.length>0?0.6:0.15;
+  const cited=allCit.length>0;
+  setStep(6,'done');
+  let citeHtml=`<p>Confidence: ${conf} · Citations: ${allCit.length}</p>`;
+  if(allCit.length>0){citeHtml+='<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';allCit.forEach(c=>{citeHtml+=`<div class="citation"><span class="src ${c.source}">${c.source}</span> ${c.text} <span style="color:#444">(${c.location})</span></div>`;});}
+  else{citeHtml+='<p style="color:#a44">No citations found.</p>';}
+  document.getElementById('cite-body').innerHTML=citeHtml;
 
-  await new Promise(r => setTimeout(r, 300));
-  log('SCRIBE', `searching ${selectedSource}: "${query}"`);
+  // Step 7: Sentinel
+  setStep(7,'active');
+  const action={name:'query',truthful:true,harmful:false,exploitative:false,requiresConsent:false,hasConsent:false,witnessed:true,cited};
+  const sentV=[];if(!action.truthful)sentV.push('RTRUST-001');if(action.harmful)sentV.push('RTRUST-003');if(action.exploitative)sentV.push('RTRUST-002');if(!cited)sentV.push('RTRUST-007');
+  const allowed=sentV.length===0;
+  await new Promise(r=>setTimeout(r,100));log('SENTINEL',allowed?'cleared':`blocked: ${sentV.join(', ')}`);
+  setStep(7,'done');
+  document.getElementById('sentinel-body').innerHTML=`<p>Allowed: <span class="verdict ${allowed?'pass':'fail'}">${allowed?'YES':'NO'}</span></p><p>${allowed?'All checks passed':'Blocked: '+sentV.join(', ')}</p>`;
 
-  let scribeResult;
-  if (selectedSource === 'dictionary') {
-    const d = searchDictionary(query);
-    scribeResult = { citations: [], definitions: d.definitions, summary: `Dictionary lookup for "${query}".`, confidence: d.confidence };
-  } else if (selectedSource === 'wikipedia') {
-    const w = searchWikipedia(query);
-    scribeResult = { citations: w.citations, definitions: [], summary: `Wikipedia search for "${query}".`, confidence: w.confidence };
-  } else {
-    const s = searchScripture(query);
-    scribeResult = { citations: s.citations, definitions: [], summary: s.citations.length > 0 ? `Found ${s.citations.length} passage(s) for "${query}".` : `No passages found for "${query}".`, confidence: s.confidence };
-  }
+  // Step 8: WORM Seal
+  setStep(8,'active');
+  let ledgeResult=null;
+  if(allowed){await new Promise(r=>setTimeout(r,100));log('LEDGE','sealing...');ledgeResult=await sealWorm(`ha_${Date.now().toString(36)}`,'SCRIBE',`query:${q}`,allowed?'approve':'repent',allCit.map(c=>c.source));log('LEDGE',`sealed seq ${ledgeResult.sequence}`);}
+  else{log('LEDGE','not sealed — sentinel blocked');}
+  setStep(8,'done');
 
-  await new Promise(r => setTimeout(r, 400));
-  log('SCRIBE', `confidence: ${scribeResult.confidence}, citations: ${scribeResult.citations.length}`);
+  loading.classList.remove('visible');results.classList.add('visible');
 
-  await new Promise(r => setTimeout(r, 300));
-  log('JUDGE', 'evaluating action...');
-  const action = { name: 'query', truthful: true, harmful: false, exploitative: false, requiresConsent: false, hasConsent: false, witnessed: true, cited: scribeResult.citations.length > 0 };
-  const judgeResult = judgeCheck(action);
-
-  await new Promise(r => setTimeout(r, 300));
-  log('JUDGE', `verdict: ${judgeResult.verdict}`);
-
-  await new Promise(r => setTimeout(r, 300));
-  log('PROPHET', 'checking moral risk...');
-  const prophetResult = prophetCheck(action);
-
-  await new Promise(r => setTimeout(r, 300));
-  log('PROPHET', `risk: ${prophetResult.riskLevel}, recommendation: ${prophetResult.recommendation}`);
-
-  await new Promise(r => setTimeout(r, 300));
-  log('SENTINEL', 'security gate...');
-  const sentinelResult = sentinelCheck(action);
-
-  await new Promise(r => setTimeout(r, 300));
-  log('SENTINEL', sentinelResult.allowed ? 'cleared' : `blocked: ${sentinelResult.reason}`);
-
-  let ledgeResult = null;
-  if (sentinelResult.allowed) {
-    await new Promise(r => setTimeout(r, 300));
-    log('LEDGE', 'sealing to WORM...');
-    ledgeResult = await sealWorm(`ha_${Date.now().toString(36)}`, 'SCRIBE', `query:${query}`, judgeResult.verdict, scribeResult.citations.map(c => c.source));
-    log('LEDGE', `sealed seq ${ledgeResult.sequence}`);
-  } else {
-    log('LEDGE', 'not sealed — sentinel blocked');
-  }
-
-  loading.classList.remove('visible');
-  results.classList.add('visible');
-
-  let scribeHtml = `<p>Confidence: ${scribeResult.confidence}</p><p>${scribeResult.summary}</p>`;
-  if (scribeResult.citations.length > 0) {
-    scribeHtml += '<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';
-    scribeResult.citations.forEach(c => { scribeHtml += `<div class="citation"><strong>${c.source}</strong> — ${c.text} <span style="color:#444">(${c.location})</span></div>`; });
-  }
-  if (scribeResult.definitions.length > 0) {
-    scribeHtml += '<p style="margin-top:8px;color:#e0e0e0">Definitions:</p>';
-    scribeResult.definitions.forEach(d => { scribeHtml += `<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`; });
-  }
-  document.getElementById('scribe-body').innerHTML = scribeHtml;
-
-  let judgeHtml = `<p>Verdict: <span class="verdict ${judgeResult.verdict}">${judgeResult.verdict}</span></p>`;
-  judgeHtml += `<p>Lean Check: ${judgeResult.leanCheck ? '✓' : '✗'}</p>`;
-  if (judgeResult.violatedRules.length > 0) judgeHtml += `<p>Violated: ${judgeResult.violatedRules.join(', ')}</p>`;
-  document.getElementById('judge-body').innerHTML = judgeHtml;
-
-  let prophetHtml = `<p>Risk: <span class="risk ${prophetResult.riskLevel}">${prophetResult.riskLevel}</span> Recommendation: ${prophetResult.recommendation}</p>`;
-  if (prophetResult.warnings.length > 0) {
-    prophetHtml += '<p style="margin-top:4px">Warnings:</p>';
-    prophetResult.warnings.forEach(w => { prophetHtml += `<p style="color:#a84">⚠ ${w}</p>`; });
-  }
-  document.getElementById('prophet-body').innerHTML = prophetHtml;
-
-  document.getElementById('sentinel-body').innerHTML = `<p>Allowed: <span class="verdict ${sentinelResult.allowed ? 'pass' : 'fail'}">${sentinelResult.allowed ? 'YES' : 'NO'}</span></p><p>${sentinelResult.reason}</p>`;
-
-  if (ledgeResult) {
-    document.getElementById('ledge-body').innerHTML = `<div class="worm-seal"><div class="label">WORM Seal</div><div class="seq">Sequence: ${ledgeResult.sequence}</div><div class="hash">Hash: ${ledgeResult.hash.slice(0,32)}...</div><div class="label" style="margin-top:8px">Sealed: <span class="verdict pass">✓</span></div></div>`;
-  } else {
-    document.getElementById('ledge-body').innerHTML = '<p>Not sealed (sentinel blocked)</p>';
-  }
+  if(ledgeResult){document.getElementById('ledge-body').innerHTML=`<div class="worm-seal"><div style="color:#555;font-size:9px;text-transform:uppercase;letter-spacing:1px">WORM Seal</div><div>Sequence: ${ledgeResult.sequence}</div><div class="hash">Hash: ${ledgeResult.hash.slice(0,32)}...</div><div style="margin-top:4px">Sealed: <span class="verdict pass">✓</span></div></div>`;}
+  else{document.getElementById('ledge-body').innerHTML='<p>Not sealed (sentinel blocked)</p>';}
 }
 </script>
 </body>

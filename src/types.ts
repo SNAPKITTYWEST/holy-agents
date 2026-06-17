@@ -4,7 +4,15 @@ export type Verdict = 'approve' | 'reject' | 'repent';
 
 export type RiskLevel = 'none' | 'low' | 'medium' | 'high' | 'critical';
 
-export type SourceType = 'scripture' | 'dictionary' | 'wikipedia' | 'rtrust' | 'worm';
+export type SourceType = 'scripture' | 'dictionary' | 'wikipedia' | 'enoch' | 'apocrypha' | 'theology' | 'rtrust' | 'worm';
+
+export type IntentType = 'definition' | 'scripture_search' | 'theology_search' | 'comparison' | 'rtrust_query' | 'unknown';
+
+export interface IntentClassification {
+  intent: IntentType;
+  corpora: SourceType[];
+  queryTerms: string[];
+}
 
 export interface Action {
   name: string;
@@ -29,9 +37,31 @@ export interface Definition {
   part_of_speech: string;
 }
 
+export interface Etymology {
+  term: string;
+  root: string;
+  origin: string;
+  meaning: string;
+  languages: string[];
+}
+
+export interface CrossLanguage {
+  term: string;
+  translations: { lang: string; word: string; meaning: string }[];
+}
+
+export interface PlainEnglish {
+  answer: string;
+  sources: string[];
+}
+
 export interface ScribeResult {
   citations: Citation[];
   definitions: Definition[];
+  etymologies: Etymology[];
+  translations: CrossLanguage[];
+  plainEnglish: PlainEnglish | null;
+  truthGate: boolean;
   summary: string;
   confidence: number;
 }
