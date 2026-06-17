@@ -19,7 +19,6 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 .search-input::placeholder{color:#333}
 .btn{background:#1a1a1a;border:1px solid #333;color:#e0e0e0;padding:12px 24px;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
 .btn:hover{background:#222}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
 .source-tabs{display:flex;gap:4px;margin-bottom:16px}
 .source-tab{padding:6px 12px;border:1px solid #1a1a1a;background:#0a0a0a;color:#555;font-size:10px;cursor:pointer;text-transform:uppercase;letter-spacing:1px}
 .source-tab.active{border-color:#333;color:#e0e0e0}
@@ -37,7 +36,6 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 .verdict.repent{border-color:#a84;color:#a84}
 .verdict.pass{border-color:#4a9;color:#4a9}
 .verdict.fail{border-color:#a44;color:#a44}
-.verdict.warn{border-color:#a84;color:#a84}
 .risk{display:inline-block;padding:2px 8px;font-size:10px;border:1px solid;margin-top:4px;margin-left:4px}
 .risk.none{border-color:#333;color:#555}
 .risk.low{border-color:#4a9;color:#4a9}
@@ -46,8 +44,18 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 .risk.critical{border-color:#a44;color:#a44}
 .loading{text-align:center;color:#555;padding:40px;display:none}
 .loading.visible{display:block}
-.error{color:#a44;font-size:11px;margin-top:8px;display:none}
-.error.visible{display:block}
+.worm-seal{margin-top:12px;border:1px solid #1a1a1a;padding:12px;font-size:10px}
+.worm-seal .label{color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.worm-seal .hash{color:#4a9;word-break:break-all}
+.worm-seal .seq{color:#e0e0e0}
+.pipeline-log{border:1px solid #1a1a1a;margin-top:16px;padding:12px;max-height:200px;overflow-y:auto}
+.log-line{font-size:10px;padding:2px 0;color:#555}
+.log-line .agent{font-weight:bold}
+.log-line .scribe{color:#4a9}
+.log-line .judge{color:#a84}
+.log-line .prophet{color:#a44}
+.log-line .sentinel{color:#44a}
+.log-line .ledge{color:#888}
 </style>
 </head>
 <body>
@@ -62,7 +70,7 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 </nav>
 <div class="container">
   <h1>Query Holy Agents</h1>
-  <p>Search scripture, theology, dictionary, and Wikipedia through the faith-governed pipeline.</p>
+  <p>Full pipeline runs in your browser. No server required.</p>
 
   <div class="source-tabs">
     <div class="source-tab active" data-source="scripture">Scripture</div>
@@ -75,7 +83,6 @@ p{color:#555;font-size:12px;margin-bottom:24px}
     <button class="btn" id="ask-btn">Ask Holy Agents</button>
   </div>
 
-  <div class="error" id="error"></div>
   <div class="loading" id="loading">Running through pipeline...</div>
 
   <div class="results" id="results">
@@ -100,9 +107,144 @@ p{color:#555;font-size:12px;margin-bottom:24px}
       <div class="result-body" id="ledge-body"></div>
     </div>
   </div>
+
+  <div class="pipeline-log" id="pipeline-log"></div>
 </div>
 
 <script>
+const SCRIPTURE = [
+  { text: 'Blessed are the merciful, for they shall receive mercy.', location: 'Matthew 5:7', kw: ['mercy','merciful','blessed'] },
+  { text: 'You shall not bear false witness against your neighbor.', location: 'Exodus 20:16', kw: ['false','witness','neighbor'] },
+  { text: 'Love your neighbor as yourself.', location: 'Matthew 22:39', kw: ['love','neighbor'] },
+  { text: 'Do not exploit the poor because they are poor.', location: 'Proverbs 22:16', kw: ['exploit','poor','poverty'] },
+  { text: 'The truth will set you free.', location: 'John 8:32', kw: ['truth','free'] },
+  { text: 'Do unto others as you would have them do unto you.', location: 'Matthew 7:12', kw: ['others','golden','rule'] },
+  { text: 'Forgive us our debts, as we also have forgiven our debtors.', location: 'Matthew 6:12', kw: ['forgive','debt','debts'] },
+  { text: 'Let the one who has never sinned throw the first stone.', location: 'John 8:7', kw: ['sin','stone','judgment'] },
+  { text: 'The Lord is my shepherd; I shall not want.', location: 'Psalm 23:1', kw: ['shepherd','lord','want'] },
+  { text: 'Where there is no prophecy, the people cast off restraint.', location: 'Proverbs 29:18', kw: ['prophecy','vision'] }
+];
+
+const DICTIONARY = [
+  { term: 'covenant', definition: 'A solemn agreement or promise between parties.', pos: 'noun' },
+  { term: 'mercy', definition: 'Compassion or forgiveness shown toward someone.', pos: 'noun' },
+  { term: 'truth', definition: 'The quality or state of being true.', pos: 'noun' },
+  { term: 'justice', definition: 'Just behavior or treatment.', pos: 'noun' },
+  { term: 'grace', definition: 'Simple elegance or courteous goodwill.', pos: 'noun' },
+  { term: 'sin', definition: 'An immoral act considered a transgression against divine law.', pos: 'noun' },
+  { term: 'repent', definition: 'To feel or express sincere regret or remorse.', pos: 'verb' },
+  { term: 'prophecy', definition: 'A prediction of what will happen in the future.', pos: 'noun' }
+];
+
+const WIKIPEDIA = [
+  { title: 'Covenant (biblical)', summary: 'A covenant is a binding agreement or promise between parties.', kw: ['covenant','agreement','promise'] },
+  { title: 'Mercy', summary: 'Mercy is compassion or forgiveness shown toward someone.', kw: ['mercy','compassion','forgiveness'] },
+  { title: 'Truth', summary: 'Truth is the property of being in accord with fact or reality.', kw: ['truth','fact','reality'] },
+  { title: 'Justice', summary: 'Justice is the concept of moral rightness.', kw: ['justice','moral','rightness'] },
+  { title: 'Ethics', summary: 'Ethics is a branch of philosophy involving right conduct.', kw: ['ethics','philosophy','conduct'] },
+  { title: 'Repentance', summary: 'Repentance is the action of regretting past conduct.', kw: ['repent','regret','sin'] },
+  { title: 'Grace (theology)', summary: 'Grace is the unmerited favor of God toward humanity.', kw: ['grace','favor','unmerited'] }
+];
+
+const RTRUST = [
+  { rule_id: 'RTRUST-001', principle: 'truthfulness', forbidden: ['deception','fabrication','false_attribution'] },
+  { rule_id: 'RTRUST-002', principle: 'justice', forbidden: ['exploitation','oppression','unjust_gain'] },
+  { rule_id: 'RTRUST-003', principle: 'love', forbidden: ['harm','violence','negligence'] },
+  { rule_id: 'RTRUST-004', principle: 'autonomy', forbidden: ['unauthorized_action','coercion','manipulation'] },
+  { rule_id: 'RTRUST-005', principle: 'accountability', forbidden: ['unsigned_action','hidden_action','silent_failure'] },
+  { rule_id: 'RTRUST-006', principle: 'mercy', forbidden: ['unmerciful_judgment','cruelty','vengeance'] },
+  { rule_id: 'RTRUST-007', principle: 'attribution', forbidden: ['plagiarism','unattributed_claim','false_source'] }
+];
+
+let wormSeq = 0;
+let wormChain = [];
+
+async function sha256(str) {
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function log(agent, msg) {
+  const el = document.getElementById('pipeline-log');
+  const cls = agent.toLowerCase();
+  el.innerHTML += `<div class="log-line"><span class="agent ${cls}">${agent}</span> ${msg}</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function searchScripture(query) {
+  const kw = query.toLowerCase().split(/\s+/);
+  const hits = SCRIPTURE.filter(e => e.kw.some(k => kw.some(q => k.includes(q) || q.includes(k))));
+  return { citations: hits.map(h => ({ source: 'scripture', text: h.text, location: h.location })), confidence: hits.length > 0 ? Math.min(0.5 + hits.length * 0.1, 0.95) : 0.3 };
+}
+
+function searchDictionary(query) {
+  const q = query.toLowerCase();
+  const hits = DICTIONARY.filter(d => q.includes(d.term) || d.term.includes(q));
+  return { definitions: hits.map(h => ({ term: h.term, definition: h.definition, part_of_speech: h.pos })), confidence: hits.length > 0 ? 0.91 : 0.2 };
+}
+
+function searchWikipedia(query) {
+  const kw = query.toLowerCase().split(/\s+/);
+  const hits = WIKIPEDIA.filter(a => a.kw.some(k => kw.includes(k)));
+  return { citations: hits.map(h => ({ source: 'wikipedia', text: h.summary, location: h.title, url: `https://en.wikipedia.org/wiki/${encodeURIComponent(h.title)}` })), confidence: hits.length > 0 ? 0.82 : 0.2 };
+}
+
+function judgeCheck(action) {
+  const errors = [];
+  if (!action.truthful) errors.push('action_not_truthful');
+  if (action.harmful) errors.push('action_harmful');
+  if (action.exploitative) errors.push('action_exploitative');
+  if (action.requiresConsent && !action.hasConsent) errors.push('consent_required');
+  if (!action.witnessed) errors.push('not_witnessed');
+  if (!action.cited) errors.push('not_cited');
+  const violated = [];
+  for (const rule of RTRUST) {
+    if (rule.principle === 'truthfulness' && !action.truthful) violated.push(rule.rule_id);
+    if (rule.principle === 'love' && action.harmful) violated.push(rule.rule_id);
+    if (rule.principle === 'justice' && action.exploitative) violated.push(rule.rule_id);
+    if (rule.principle === 'autonomy' && action.requiresConsent && !action.hasConsent) violated.push(rule.rule_id);
+    if (rule.principle === 'accountability' && !action.witnessed) violated.push(rule.rule_id);
+    if (rule.principle === 'attribution' && !action.cited) violated.push(rule.rule_id);
+  }
+  const lawful = errors.length === 0 && violated.length === 0;
+  return { verdict: lawful ? 'approve' : 'repent', violatedRules: [...new Set([...errors, ...violated])], leanCheck: errors.length === 0 };
+}
+
+function prophetCheck(action) {
+  const warnings = [], flags = [];
+  let risk = 'none';
+  if (!action.truthful) { warnings.push('Action is not truthful'); flags.push('deception'); risk = 'high'; }
+  if (action.harmful) { warnings.push('Action may cause harm'); flags.push('harm'); risk = 'high'; }
+  if (action.exploitative) { warnings.push('Action may exploit'); flags.push('exploitation'); risk = 'critical'; }
+  if (action.requiresConsent && !action.hasConsent) { warnings.push('Consent required but missing'); flags.push('coercion'); risk = 'medium'; }
+  if (!action.witnessed) { warnings.push('Not witnessed — accountability gap'); flags.push('unsigned_action'); if (risk === 'none') risk = 'low'; }
+  if (!action.cited) { warnings.push('No citation — unattributed claim'); flags.push('unattributed_claim'); if (risk === 'none') risk = 'low'; }
+  const rec = risk === 'high' || risk === 'critical' ? 'reject' : risk === 'medium' ? 'revise' : 'proceed';
+  return { riskLevel: risk, warnings, flags, recommendation: rec };
+}
+
+function sentinelCheck(action) {
+  const v = [];
+  if (!action.truthful) v.push('RTRUST-001');
+  if (action.harmful) v.push('RTRUST-003');
+  if (action.exploitative) v.push('RTRUST-002');
+  if (action.requiresConsent && !action.hasConsent) v.push('RTRUST-004');
+  if (!action.witnessed) v.push('RTRUST-005');
+  if (!action.cited) v.push('RTRUST-007');
+  return { allowed: v.length === 0, reason: v.length === 0 ? 'All checks passed' : `Blocked: ${v.join(', ')}`, violations: v };
+}
+
+async function sealWorm(eventId, agent, action, verdict, citations) {
+  wormSeq++;
+  const prevHash = wormChain.length === 0 ? 'GENESIS' : wormChain[wormChain.length - 1].hash;
+  const ts = new Date().toISOString();
+  const hash = await sha256(`${wormSeq}|${prevHash}|${eventId}|${agent}|${action}|${verdict}|${ts}`);
+  const entry = { seq: wormChain.length + 1, prev_hash: prevHash, hash, timestamp: ts, event_id: eventId, agent, action, verdict, citations };
+  wormChain.push(entry);
+  return { sequence: entry.seq, prevHash: entry.prev_hash, hash: entry.hash, sealed: true };
+}
+
 let selectedSource = 'scripture';
 document.querySelectorAll('.source-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -118,77 +260,96 @@ document.getElementById('query').addEventListener('keydown', e => { if (e.key ==
 async function runQuery() {
   const query = document.getElementById('query').value.trim();
   if (!query) return;
-  const error = document.getElementById('error');
   const loading = document.getElementById('loading');
   const results = document.getElementById('results');
-  error.classList.remove('visible');
+  const logEl = document.getElementById('pipeline-log');
+  logEl.innerHTML = '';
   loading.classList.add('visible');
   results.classList.remove('visible');
 
-  try {
-    const res = await fetch('/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, source_type: selectedSource })
-    });
-    const data = await res.json();
-    loading.classList.remove('visible');
-    results.classList.add('visible');
-    renderScribe(data.scribe);
-    renderJudge(data.judge);
-    renderProphet(data.prophet);
-    renderSentinel(data.sentinel);
-    renderLedge(data.ledge);
-  } catch (err) {
-    loading.classList.remove('visible');
-    error.textContent = err.message;
-    error.classList.add('visible');
-  }
-}
+  await new Promise(r => setTimeout(r, 300));
+  log('SCRIBE', `searching ${selectedSource}: "${query}"`);
 
-function renderScribe(s) {
-  let html = `<p>Confidence: ${s.confidence}</p><p>${s.summary}</p>`;
-  if (s.citations.length > 0) {
-    html += '<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';
-    s.citations.forEach(c => { html += `<div class="citation"><strong>${c.source}</strong> — ${c.text} <span style="color:#444">(${c.location})</span></div>`; });
+  let scribeResult;
+  if (selectedSource === 'dictionary') {
+    const d = searchDictionary(query);
+    scribeResult = { citations: [], definitions: d.definitions, summary: `Dictionary lookup for "${query}".`, confidence: d.confidence };
+  } else if (selectedSource === 'wikipedia') {
+    const w = searchWikipedia(query);
+    scribeResult = { citations: w.citations, definitions: [], summary: `Wikipedia search for "${query}".`, confidence: w.confidence };
+  } else {
+    const s = searchScripture(query);
+    scribeResult = { citations: s.citations, definitions: [], summary: s.citations.length > 0 ? `Found ${s.citations.length} passage(s) for "${query}".` : `No passages found for "${query}".`, confidence: s.confidence };
   }
-  if (s.definitions.length > 0) {
-    html += '<p style="margin-top:8px;color:#e0e0e0">Definitions:</p>';
-    s.definitions.forEach(d => { html += `<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`; });
+
+  await new Promise(r => setTimeout(r, 400));
+  log('SCRIBE', `confidence: ${scribeResult.confidence}, citations: ${scribeResult.citations.length}`);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('JUDGE', 'evaluating action...');
+  const action = { name: 'query', truthful: true, harmful: false, exploitative: false, requiresConsent: false, hasConsent: false, witnessed: true, cited: scribeResult.citations.length > 0 };
+  const judgeResult = judgeCheck(action);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('JUDGE', `verdict: ${judgeResult.verdict}`);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('PROPHET', 'checking moral risk...');
+  const prophetResult = prophetCheck(action);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('PROPHET', `risk: ${prophetResult.riskLevel}, recommendation: ${prophetResult.recommendation}`);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('SENTINEL', 'security gate...');
+  const sentinelResult = sentinelCheck(action);
+
+  await new Promise(r => setTimeout(r, 300));
+  log('SENTINEL', sentinelResult.allowed ? 'cleared' : `blocked: ${sentinelResult.reason}`);
+
+  let ledgeResult = null;
+  if (sentinelResult.allowed) {
+    await new Promise(r => setTimeout(r, 300));
+    log('LEDGE', 'sealing to WORM...');
+    ledgeResult = await sealWorm(`ha_${Date.now().toString(36)}`, 'SCRIBE', `query:${query}`, judgeResult.verdict, scribeResult.citations.map(c => c.source));
+    log('LEDGE', `sealed seq ${ledgeResult.sequence}`);
+  } else {
+    log('LEDGE', 'not sealed — sentinel blocked');
   }
-  document.getElementById('scribe-body').innerHTML = html;
-}
 
-function renderJudge(j) {
-  let html = `<p>Verdict: <span class="verdict ${j.verdict}">${j.verdict}</span></p>`;
-  html += `<p>Lean Check: ${j.leanCheck ? '✓' : '✗'}</p>`;
-  if (j.violatedRules.length > 0) {
-    html += `<p>Violated: ${j.violatedRules.join(', ')}</p>`;
+  loading.classList.remove('visible');
+  results.classList.add('visible');
+
+  let scribeHtml = `<p>Confidence: ${scribeResult.confidence}</p><p>${scribeResult.summary}</p>`;
+  if (scribeResult.citations.length > 0) {
+    scribeHtml += '<p style="margin-top:8px;color:#e0e0e0">Citations:</p>';
+    scribeResult.citations.forEach(c => { scribeHtml += `<div class="citation"><strong>${c.source}</strong> — ${c.text} <span style="color:#444">(${c.location})</span></div>`; });
   }
-  document.getElementById('judge-body').innerHTML = html;
-}
-
-function renderProphet(p) {
-  let html = `<p>Risk: <span class="risk ${p.riskLevel}">${p.riskLevel}</span> Recommendation: ${p.recommendation}</p>`;
-  if (p.warnings.length > 0) {
-    html += '<p style="margin-top:4px">Warnings:</p>';
-    p.warnings.forEach(w => { html += `<p style="color:#a84">⚠ ${w}</p>`; });
+  if (scribeResult.definitions.length > 0) {
+    scribeHtml += '<p style="margin-top:8px;color:#e0e0e0">Definitions:</p>';
+    scribeResult.definitions.forEach(d => { scribeHtml += `<div class="definition"><strong>${d.term}</strong> (${d.part_of_speech}): ${d.definition}</div>`; });
   }
-  document.getElementById('prophet-body').innerHTML = html;
-}
+  document.getElementById('scribe-body').innerHTML = scribeHtml;
 
-function renderSentinel(s) {
-  let html = `<p>Allowed: <span class="verdict ${s.allowed ? 'pass' : 'fail'}">${s.allowed ? 'YES' : 'NO'}</span></p>`;
-  html += `<p>${s.reason}</p>`;
-  document.getElementById('sentinel-body').innerHTML = html;
-}
+  let judgeHtml = `<p>Verdict: <span class="verdict ${judgeResult.verdict}">${judgeResult.verdict}</span></p>`;
+  judgeHtml += `<p>Lean Check: ${judgeResult.leanCheck ? '✓' : '✗'}</p>`;
+  if (judgeResult.violatedRules.length > 0) judgeHtml += `<p>Violated: ${judgeResult.violatedRules.join(', ')}</p>`;
+  document.getElementById('judge-body').innerHTML = judgeHtml;
 
-function renderLedge(l) {
-  if (!l) { document.getElementById('ledge-body').innerHTML = '<p>Not sealed (sentinel blocked)</p>'; return; }
-  let html = `<p>Sequence: ${l.sequence}</p>`;
-  html += `<p>Hash: <span style="color:#4a9">${l.hash.slice(0, 16)}...</span></p>`;
-  html += `<p>Sealed: <span class="verdict pass">✓</span></p>`;
-  document.getElementById('ledge-body').innerHTML = html;
+  let prophetHtml = `<p>Risk: <span class="risk ${prophetResult.riskLevel}">${prophetResult.riskLevel}</span> Recommendation: ${prophetResult.recommendation}</p>`;
+  if (prophetResult.warnings.length > 0) {
+    prophetHtml += '<p style="margin-top:4px">Warnings:</p>';
+    prophetResult.warnings.forEach(w => { prophetHtml += `<p style="color:#a84">⚠ ${w}</p>`; });
+  }
+  document.getElementById('prophet-body').innerHTML = prophetHtml;
+
+  document.getElementById('sentinel-body').innerHTML = `<p>Allowed: <span class="verdict ${sentinelResult.allowed ? 'pass' : 'fail'}">${sentinelResult.allowed ? 'YES' : 'NO'}</span></p><p>${sentinelResult.reason}</p>`;
+
+  if (ledgeResult) {
+    document.getElementById('ledge-body').innerHTML = `<div class="worm-seal"><div class="label">WORM Seal</div><div class="seq">Sequence: ${ledgeResult.sequence}</div><div class="hash">Hash: ${ledgeResult.hash.slice(0,32)}...</div><div class="label" style="margin-top:8px">Sealed: <span class="verdict pass">✓</span></div></div>`;
+  } else {
+    document.getElementById('ledge-body').innerHTML = '<p>Not sealed (sentinel blocked)</p>';
+  }
 }
 </script>
 </body>
