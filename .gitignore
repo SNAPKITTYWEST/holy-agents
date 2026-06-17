@@ -1,0 +1,7 @@
+node_modules/
+dist/
+state/*.jsonl
+state/holy_agents_state.json
+worm/*.jsonl
+.env
+*.log

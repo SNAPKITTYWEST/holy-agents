@@ -1,0 +1,48 @@
+{
+  "zones": {
+    "altar": [50, 100],
+    "library": [180, 120],
+    "court": [340, 120],
+    "forge": [500, 180],
+    "ledge": [650, 260],
+    "sentinel_gate": [420, 360]
+  },
+  "emoji_actions": {
+    "🔍📖": "search scripture or theology",
+    "⚖️🧠": "verify logic",
+    "🔥🚫": "reject unsafe action",
+    "🕊️✅": "approve peaceful action",
+    "🧾🔐": "seal decision",
+    "🔁🙏": "repentance loop",
+    "🏗️🚀": "build production code",
+    "🔍📚": "search dictionary",
+    "🔍🌐": "search Wikipedia"
+  },
+  "agents": {
+    "SCRIBE": {
+      "emoji": "🔍📖",
+      "zone": "library",
+      "role": "theological_retrieval"
+    },
+    "JUDGE": {
+      "emoji": "⚖️🧠",
+      "zone": "court",
+      "role": "logic_validator"
+    },
+    "PROPHET": {
+      "emoji": "🔥",
+      "zone": "forge",
+      "role": "warning_system"
+    },
+    "SENTINEL": {
+      "emoji": "🛡️",
+      "zone": "sentinel_gate",
+      "role": "security_gate"
+    },
+    "LEDGE": {
+      "emoji": "🧾🔐",
+      "zone": "ledge",
+      "role": "worm_seal"
+    }
+  }
+}
