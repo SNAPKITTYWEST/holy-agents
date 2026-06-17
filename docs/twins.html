@@ -42,6 +42,25 @@ p{color:#555;font-size:12px;margin-bottom:24px}
 .disagreements{margin-top:16px;border:1px solid #a443;padding:12px}
 .disagreements h3{color:#a44;font-size:11px;margin-bottom:8px}
 .disagreement{font-size:10px;color:#888;margin-bottom:4px}
+.remediation{margin-top:24px}
+.remediation h2{color:#e0e0e0;font-size:14px;margin-bottom:4px}
+.remediation-sub{color:#555;font-size:11px;margin-bottom:16px}
+.repair-card{border:1px solid #1a1a1a;margin-bottom:12px;overflow:hidden}
+.repair-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #111}
+.repair-id{color:#e0e0e0;font-size:11px;font-weight:bold}
+.repair-verdict{padding:2px 8px;font-size:9px;border:1px solid;text-transform:uppercase;letter-spacing:1px}
+.repair-verdict.before{border-color:#a44;color:#a44}
+.repair-verdict.after{border-color:#4a9;color:#4a9}
+.repair-body{padding:12px 16px}
+.repair-row{display:flex;gap:12px;margin-bottom:8px}
+.repair-col{flex:1;padding:10px;border:1px solid #111}
+.repair-col-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.repair-col.before .repair-col-label{color:#a44}
+.repair-col.after .repair-col-label{color:#4a9}
+.repair-col.before{background:#0a0000}
+.repair-col.after{background:#000a00}
+.repair-col-text{font-size:10px;color:#888;line-height:1.5}
+.repair-file{font-size:9px;color:#444;margin-top:4px}
 .animation-zone{border:1px solid #1a1a1a;padding:16px;margin-bottom:16px;text-align:center}
 #twin-canvas{background:#050505;display:block;margin:0 auto}
 .vote-bar{display:flex;gap:4px;margin-top:12px;justify-content:center}
@@ -121,6 +140,141 @@ p{color:#555;font-size:12px;margin-bottom:24px}
   <div class="disagreements" id="disagreements" style="display:none">
     <h3>⚡ Disagreements</h3>
     <div id="disagreement-list"></div>
+  </div>
+
+  <div class="remediation">
+    <h2>Previous Failure → Current Pass</h2>
+    <div class="remediation-sub">9 consensus failures repaired via repentance cycle. Each finding was diagnosed, repaired, and re-audited.</div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">1. WORM Race Condition</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">readEntries() → modify → writeEntries() rewrote entire file. Concurrent appends overwrite each other.</div><div class="repair-file">src/worm.ts — writeEntries()</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">appendLine() using fs.appendFileSync(). Single-line atomic append, no full-file rewrite.</div><div class="repair-file">src/worm.ts — appendLine()</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">2. Path Traversal Vulnerability</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">serveStatic() joined paths with no containment check. /docs/../../src/server.ts served arbitrary files.</div><div class="repair-file">src/server.ts — path.join()</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">isPathSafe() resolves full path, checks it starts with DOCS_DIR. Returns 403 on escape.</div><div class="repair-file">src/server.ts — isPathSafe()</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">3. RTRUST Enforcement Incomplete</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">checkActionAgainstRules() checked 3 of 7 principles: truthfulness, love, justice. Autonomy, accountability, attribution unenforced.</div><div class="repair-file">src/rtrust.ts — switch (principle)</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">Added autonomy (consent), accountability (witnessed), attribution (cited). All 7 principles enforced.</div><div class="repair-file">src/rtrust.ts — 7 cases</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">4. Reverse Proof Not Integrated</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">reverseProof hardcoded to { allVerified: true, orphanArtifacts: [] }. buildReverseProof() never called.</div><div class="repair-file">src/server.ts — /query endpoint</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">buildReverseProof() called with actual artifact maps. Article III of Second Trust Deed enforced.</div><div class="repair-file">src/server.ts — /query, /audit</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">5. Unsafe JSON.parse</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">JSON.parse without try/catch in worm.ts, rtrust.ts, server.ts. Corrupted data crashes the system.</div><div class="repair-file">src/worm.ts, rtrust.ts, server.ts</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">All JSON.parse calls wrapped in try/catch. Corrupt lines skipped gracefully. POST handlers return 400.</div><div class="repair-file">src/worm.ts, rtrust.ts, server.ts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">6. Missing Request Validation</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">POST endpoints accept arbitrary JSON. body.query as string — no type checks.</div><div class="repair-file">src/server.ts — POST /query, /action</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">validateQueryBody() and validateActionBody() type guards. Returns 400 for missing/invalid fields.</div><div class="repair-file">src/server.ts — validators</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">7. Sync I/O Hot Paths</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">loadRTRUST() reads constitution from disk on every request. No caching.</div><div class="repair-file">src/rtrust.ts — loadRTRUST()</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">Module-level cachedRules with clearRTRUSTCache(). Loaded once, cached for subsequent requests.</div><div class="repair-file">src/rtrust.ts — cachedRules</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">8. FORBIDDEN_ACTIONS Incomplete</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">unmerciful_judgment, cruelty, vengeance from RTRUST-006 missing. 21 of 24.</div><div class="repair-file">src/validation.ts — FORBIDDEN_ACTIONS</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">Added 3 missing actions. Total now 24. All RTRUST-006 violations covered.</div><div class="repair-file">src/validation.ts — 24 items</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card">
+      <div class="repair-header">
+        <span class="repair-id">9. Sentinel Skips RTRUST</span>
+        <div><span class="repair-verdict before">FAIL</span> <span class="repair-verdict after">PASS</span></div>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before</div><div class="repair-col-text">sentinelCheck() only calls validateAction and checkForbidden. RTRUST rule violations ignored.</div><div class="repair-file">src/agents/sentinel.ts — sentinelCheck()</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After</div><div class="repair-col-text">Now imports and calls checkActionAgainstRules() from rtrust.ts. RTRUST violations added to violations array.</div><div class="repair-file">src/agents/sentinel.ts — RTRUST check</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repair-card" style="border-color:#4a9">
+      <div class="repair-header" style="background:#000a00">
+        <span class="repair-id" style="color:#4a9">Re-Audit Summary</span>
+        <span class="repair-verdict after" style="font-size:10px">0/3 FAIL</span>
+      </div>
+      <div class="repair-body">
+        <div class="repair-row">
+          <div class="repair-col before"><div class="repair-col-label">Before — All Twins</div><div class="repair-col-text">TWIN-A (Security): FAIL 0.88<br>TWIN-B (Logic): FAIL 0.42<br>TWIN-C (Performance): FAIL 0.45</div></div>
+          <div class="repair-col after"><div class="repair-col-label">After — All Twins</div><div class="repair-col-text">TWIN-A (Security): PASS 0.92<br>TWIN-B (Logic): PASS 0.85<br>TWIN-C (Performance): PASS 0.88</div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
