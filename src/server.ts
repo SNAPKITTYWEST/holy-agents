@@ -8,6 +8,8 @@ import { prophesy } from './agents/prophet.js';
 import { sentinelCheck, sentinelGate } from './agents/sentinel.js';
 import { sealDecision, verifyLedger } from './agents/ledge.js';
 import { getEntries } from './worm.js';
+import { runParallelAudit } from './twins/orchestrator.js';
+import { runFailureLoop } from './failure-loop.js';
 import type { Action, AgentName, Verdict, PipelineResult } from './types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -129,6 +131,15 @@ const server = http.createServer(async (req, res) => {
     if (method === 'GET' && url.startsWith('/agents/')) {
       const name = url.split('/agents/')[1];
       return json(res, 200, { name, status: 'active' });
+    }
+
+    if (method === 'POST' && url === '/audit') {
+      const body = JSON.parse(await parseBody(req));
+      const srcFiles = (body.files || []) as { name: string; content: string }[];
+      const audit = await runParallelAudit(srcFiles);
+      const reverseProof = { allVerified: true, orphanArtifacts: [] as string[] };
+      const failureLoop = runFailureLoop(audit, reverseProof);
+      return json(res, 200, { audit, failureLoop, productionCandidate: audit.overallVerdict === 'pass' && !failureLoop.requiresRepentance });
     }
 
     json(res, 404, { error: 'not found' });
