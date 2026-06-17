@@ -29,6 +29,17 @@ const checks = [
   { name: 'src/agents/ledge.ts exists', test: () => fs.existsSync('src/agents/ledge.ts') },
   { name: 'docs/index.html exists', test: () => fs.existsSync('docs/index.html') },
   { name: 'docs/visualizer.js exists', test: () => fs.existsSync('docs/visualizer.js') },
+  { name: 'docs/query.html exists', test: () => fs.existsSync('docs/query.html') },
+  { name: 'docs/agents.html exists', test: () => fs.existsSync('docs/agents.html') },
+  { name: 'docs/twins.html exists', test: () => fs.existsSync('docs/twins.html') },
+  { name: 'docs/debate.html exists', test: () => fs.existsSync('docs/debate.html') },
+  { name: 'docs/repl.html exists', test: () => fs.existsSync('docs/repl.html') },
+  { name: 'docs/repl.js exists', test: () => fs.existsSync('docs/repl.js') },
+  { name: 'docs/repl.css exists', test: () => fs.existsSync('docs/repl.css') },
+  { name: 'docs/state/ascii_registry.json exists', test: () => fs.existsSync('docs/state/ascii_registry.json') },
+  { name: 'docs index links to repl', test: () => { const c = fs.readFileSync('docs/index.html','utf-8'); return c.includes('repl.html'); } },
+  { name: 'docs query links to repl', test: () => { const c = fs.readFileSync('docs/query.html','utf-8'); return c.includes('repl.html'); } },
+  { name: 'docs debate links to repl', test: () => { const c = fs.readFileSync('docs/debate.html','utf-8'); return c.includes('repl.html'); } },
 ];
 
 let pass = 0;

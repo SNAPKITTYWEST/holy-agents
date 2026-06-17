@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>repl · holy-agents</title>
+<link rel="stylesheet" href="repl.css">
+</head>
+<body>
+<div class="top-bar">
+  <div class="brand">HOLY AGENTS REPL</div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="ascii">ASCII MODE</button>
+    <button class="mode-btn" data-mode="glyph">GLYPH MODE</button>
+  </div>
+  <div class="links">
+    <a href="index.html">home</a>
+    <a href="query.html">query</a>
+    <a href="agents.html">agents</a>
+    <a href="twins.html">twins</a>
+    <a href="debate.html">debate</a>
+  </div>
+</div>
+<div class="terminal" id="terminal"></div>
+<div class="input-bar">
+  <span class="prompt">holy-agents $</span>
+  <input id="cmd-input" placeholder="type a command — try 'help'" autofocus />
+</div>
+<div class="scanline" id="scanline"></div>
+<script src="repl.js"></script>
+</body>
+</html>

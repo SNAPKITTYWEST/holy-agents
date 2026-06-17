@@ -1,0 +1,97 @@
+{
+  "agents": [
+    {
+      "id": "SCRIBE",
+      "emoji": "🔍📖",
+      "title": "SCRIBE — SOURCE RETRIEVAL",
+      "ascii": "╔══════════════════════════╗\n║  🔍📖 SCRIBE             ║\n║  SOURCE RETRIEVAL        ║\n║  scripture · dictionary  ║\n║  wikipedia · enoch       ║\n╚══════════════════════════╝",
+      "status_fields": ["citations", "confidence", "truth_gate"]
+    },
+    {
+      "id": "JUDGE",
+      "emoji": "⚖️",
+      "title": "JUDGE — LOGIC CHECK",
+      "ascii": "╔══════════════════════════╗\n║  ⚖️  JUDGE               ║\n║  LOGIC CHECK             ║\n║  approve · repent        ║\n║  lean verification       ║\n╚══════════════════════════╝",
+      "status_fields": ["verdict", "violated_rules", "lean_check"]
+    },
+    {
+      "id": "PROPHET",
+      "emoji": "🔥",
+      "title": "PROPHET — RISK WARNING",
+      "ascii": "╔══════════════════════════╗\n║  🔥 PROPHET              ║\n║  RISK WARNING            ║\n║  none · low · high       ║\n║  deception · harm · etc  ║\n╚══════════════════════════╝",
+      "status_fields": ["risk_level", "warnings", "recommendation"]
+    },
+    {
+      "id": "SENTINEL",
+      "emoji": "🛡️",
+      "title": "SENTINEL — SECURITY GATE",
+      "ascii": "╔══════════════════════════╗\n║  🛡️  SENTINEL            ║\n║  SECURITY GATE           ║\n║  allowed · blocked       ║\n║  RTRUST enforcement      ║\n╚══════════════════════════╝",
+      "status_fields": ["allowed", "reason", "violations"]
+    },
+    {
+      "id": "LEDGE",
+      "emoji": "🧾🔐",
+      "title": "LEDGE — WORM SEAL",
+      "ascii": "╔══════════════════════════╗\n║  🧾🔐 LEDGE              ║\n║  WORM SEAL               ║\n║  sequence · hash         ║\n║  append-only ledger      ║\n╚══════════════════════════╝",
+      "status_fields": ["sequence", "hash", "sealed"]
+    },
+    {
+      "id": "ENKI",
+      "emoji": "🔮",
+      "title": "ENKI — DEBATE EXPLORER",
+      "ascii": "╔══════════════════════════╗\n║  🔮 ENKI                 ║\n║  DEBATE EXPLORER         ║\n║  tension · synthesis     ║\n║  quantum vs biblical     ║\n╚══════════════════════════╝",
+      "status_fields": ["confidence", "synthesis_label", "tension"]
+    },
+    {
+      "id": "ADVERSARY",
+      "emoji": "⚔️",
+      "title": "ADVERSARY — RED TEAM",
+      "ascii": "╔══════════════════════════╗\n║  ⚔️  ADVERSARY           ║\n║  RED TEAM                ║\n║  weak analogy · overclaim║\n║  scientific misuse       ║\n╚══════════════════════════╝",
+      "status_fields": ["passed", "challenges", "verdict"]
+    },
+    {
+      "id": "MISCONCEPTION",
+      "emoji": "🎭",
+      "title": "MISCONCEPTION — REASONING ERRORS",
+      "ascii": "╔══════════════════════════╗\n║  🎭 MISCONCEPTION        ║\n║  REASONING ERRORS        ║\n║  correlation ≠ causation ║\n║  analogy ≠ proof         ║\n╚══════════════════════════╝",
+      "status_fields": ["classification", "severity", "reason"]
+    },
+    {
+      "id": "NOISE",
+      "emoji": "🦠",
+      "title": "NOISE — MISLEADING CLAIMS",
+      "ascii": "╔══════════════════════════╗\n║  🦠 NOISE                ║\n║  MISLEADING CLAIMS       ║\n║  keyword collision       ║\n║  semantic drift          ║\n╚══════════════════════════╝",
+      "status_fields": ["type", "description", "severity"]
+    }
+  ],
+  "states": [
+    {
+      "id": "WORM_SEAL",
+      "emoji": "🔒",
+      "title": "WORM SEAL — ACTION SEALED",
+      "ascii": "╔══════════════════════════╗\n║  🔒 WORM SEAL            ║\n║  ═══════════════════     ║\n║  SEQ: {sequence}         ║\n║  HASH: {hash}            ║\n║  ═══════════════════     ║\n║  SEALED ✓                ║\n╚══════════════════════════╝",
+      "status_fields": ["sequence", "hash"]
+    },
+    {
+      "id": "PIPELINE_PASS",
+      "emoji": "✅",
+      "title": "PIPELINE — ALL GATES PASSED",
+      "ascii": "╔══════════════════════════╗\n║  ✅ PIPELINE PASS        ║\n║  ──────────────────      ║\n║  SCRIBE    ✓             ║\n║  JUDGE     ✓             ║\n║  PROPHET   ✓             ║\n║  SENTINEL  ✓             ║\n║  LEDGE     ✓             ║\n║  ──────────────────      ║\n║  VERDICT: APPROVE        ║\n╚══════════════════════════╝",
+      "status_fields": ["verdict"]
+    },
+    {
+      "id": "PIPELINE_BLOCK",
+      "emoji": "🚫",
+      "title": "PIPELINE — BLOCKED",
+      "ascii": "╔══════════════════════════╗\n║  🚫 PIPELINE BLOCK       ║\n║  ──────────────────      ║\n║  SCRIBE    ✓             ║\n║  JUDGE     ✓             ║\n║  PROPHET   ⚠             ║\n║  SENTINEL  ✗ BLOCKED     ║\n║  LEDGE     ✗             ║\n║  ──────────────────      ║\n║  VERDICT: REPENT         ║\n╚══════════════════════════╝",
+      "status_fields": ["blocked_at", "reason"]
+    },
+    {
+      "id": "REPENTANCE_LOOP",
+      "emoji": "🔄",
+      "title": "REPENTANCE — 7-QUESTION LOOP",
+      "ascii": "╔══════════════════════════╗\n║  🔄 REPENTANCE LOOP      ║\n║  ──────────────────      ║\n║  Q1: Was it truthful?    ║\n║  Q2: Was it just?        ║\n║  Q3: Was it loving?      ║\n║  Q4: Was it autonomous?  ║\n║  Q5: Was it witnessed?   ║\n║  Q6: Was it cited?       ║\n║  Q7: Was it accountable? ║\n║  ──────────────────      ║\n║  FAILURES: {count}       ║\n╚══════════════════════════╝",
+      "status_fields": ["requires_repentance", "failures_found"]
+    }
+  ]
+}
