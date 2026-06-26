@@ -73,3 +73,5 @@ npm run verify
 ## License
 
 MIT
+
+![](https://sovereign-analytics.snapkittywest.workers.dev/canary/holy-agents)
